@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء مخطط سير عمل تطبيق صيانة — إنشاء المخطط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg-0:#0B1220;
+    --bg-1:#131C2E;
+    --bg-2:#1C2740;
+    --neon-cyan:#22D3EE;
+    --neon-blue:#38BDF8;
+    --neon-green:#10B981;
+    --neon-yellow:#FBBF24;
+    --neon-orange:#F97316;
+    --neon-purple:#A855F7;
+    --neon-pink:#F472B6;
+    --text:#E2E8F0;
+    --text-light:#94A3B8;
+    --text-dim:#64748B;
+
+    --path-technical:#38BDF8;
+    --path-features:#A855F7;
+    --path-advantages:#FBBF24;
+    --path-design:#F472B6;
+    --path-devices:#10B981;
+
+    --shadow-card:
+      0 10px 30px rgba(0,0,0,0.55),
+      0 2px 6px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    --border-metal: linear-gradient(135deg,#6B7A99 0%,#C7D0E0 45%,#8B9AB8 60%,#6B7A99 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(34,211,238,0.1) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 100%, rgba(168,85,247,0.1) 0%, transparent 45%),
+      linear-gradient(180deg,var(--bg-0) 0%,var(--bg-1) 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+    background-size:52px 52px;
+    pointer-events:none;z-index:0;
+  }
+  body > *{position:relative;z-index:1;}
+
+  .metal-card{
+    position:relative;
+    background:linear-gradient(135deg,var(--bg-2) 0%,var(--bg-1) 100%);
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid transparent;
+    background-clip:padding-box;
+  }
+  .metal-card::before{
+    content:'';position:absolute;inset:-2px;
+    border-radius:20px;background:var(--border-metal);
+    z-index:-1;opacity:0.55;
+  }
+  .metal-card::after{
+    content:'';position:absolute;inset:0;border-radius:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 30%);
+    pointer-events:none;
+  }
+
+  /* TOPBAR */
+  .topbar{
+    padding:16px 20px;
+    background:linear-gradient(135deg,#0d1828 0%,#1a2942 50%,#0d1828 100%);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,#22D3EE 0%,#A855F7 50%,#F472B6 100%) 1;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 6px 30px rgba(34,211,238,0.15);
+  }
+  .topbar-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+  }
+  .topbar-title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1rem;color:#fff;}
+  .topbar-title .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(34,211,238,0.5);
+  }
+  .topbar-title .icon-badge svg{width:20px;height:20px;color:#0B1220;}
+  .topbar-title .chip{
+    background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(168,85,247,0.2));
+    border:1px solid rgba(34,211,238,0.4);
+    padding:4px 12px;border-radius:20px;
+    font-size:.74rem;font-weight:700;color:#22D3EE;
+    text-shadow:0 0 8px rgba(34,211,238,0.5);
+  }
+  .nav-buttons{display:flex;gap:8px;flex-wrap:wrap;}
+  .nav-btn{
+    background:linear-gradient(135deg,rgba(107,122,153,0.25),rgba(199,208,224,0.15));
+    border:1px solid rgba(199,208,224,0.3);
+    color:#E2E8F0;text-decoration:none;
+    padding:7px 14px;border-radius:10px;
+    font-size:.85rem;font-weight:700;font-family:inherit;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .22s;cursor:pointer;
+    backdrop-filter:blur(6px);
+  }
+  .nav-btn:hover{border-color:#22D3EE;box-shadow:0 0 15px rgba(34,211,238,0.35);transform:translateY(-1px);}
+  .nav-btn svg{width:15px;height:15px;}
+
+  .container{max-width:1180px;margin:0 auto;padding:22px 20px 0;}
+
+  .lesson-head{padding:22px 24px;margin-bottom:18px;}
+  .lesson-head h1{
+    font-size:1.5rem;font-weight:900;
+    display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;
+    color:#fff;
+  }
+  .lesson-head h1 .badge{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;font-size:.72rem;font-weight:800;
+    padding:4px 12px;border-radius:20px;
+    box-shadow:0 0 15px rgba(168,85,247,0.4);
+  }
+  .lesson-head p{font-size:.96rem;color:var(--text-light);}
+
+  /* TABS */
+  .tabs{
+    display:flex;gap:6px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:14px;padding:6px;margin-bottom:16px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    flex:1;min-width:130px;border:none;background:transparent;
+    font-family:inherit;font-size:.9rem;font-weight:800;
+    color:var(--text-light);padding:11px 14px;border-radius:10px;
+    cursor:pointer;transition:all .25s;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    white-space:nowrap;
+  }
+  .tab-btn svg{width:17px;height:17px;}
+  .tab-btn:hover{background:rgba(34,211,238,0.08);color:#22D3EE;}
+  .tab-btn.active{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:0 0 20px rgba(34,211,238,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="build"].active{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 0 20px rgba(168,85,247,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="result"].active{
+    background:linear-gradient(135deg,#FBBF24,#F97316);
+    color:#0B1220;
+    box-shadow:0 0 20px rgba(251,191,36,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== ABOUT PANEL ===== */
+  .about-card{
+    padding:22px 24px;margin-bottom:16px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+  }
+  .about-card h2{
+    font-size:1.12rem;font-weight:900;color:#fff;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .about-card h2 svg{color:#22D3EE;filter:drop-shadow(0 0 6px rgba(34,211,238,0.6));}
+  .about-card p{font-size:.95rem;color:var(--text);margin-bottom:10px;}
+
+  .story-box{
+    padding:16px 20px;
+    background:linear-gradient(135deg,rgba(34,211,238,0.1),rgba(168,85,247,0.08));
+    border-right:4px solid #22D3EE;
+    border-radius:12px;
+    font-size:.95rem;
+    margin-bottom:14px;
+  }
+  .story-box strong{color:#22D3EE;}
+
+  .paths-grid{
+    display:grid;gap:12px;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    margin-top:14px;
+  }
+  .path-card{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border-radius:12px;
+    padding:14px 16px;
+    border:1px solid rgba(107,122,153,0.3);
+    border-right:4px solid var(--path-color, #22D3EE);
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    transition:all .25s;
+  }
+  .path-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 22px rgba(0,0,0,0.4);
+  }
+  .path-card .pc-icon{
+    width:36px;height:36px;border-radius:9px;
+    background:linear-gradient(135deg,var(--path-color),var(--path-color));
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:8px;
+    box-shadow:0 0 15px var(--path-glow);
+  }
+  .path-card .pc-icon svg{width:18px;height:18px;color:#0B1220;}
+  .path-card h4{font-size:.92rem;font-weight:800;color:#fff;margin-bottom:4px;}
+  .path-card p{font-size:.78rem;color:var(--text-light);line-height:1.5;}
+
+  /* ===== ISO STAGE ===== */
+  .stage-wrap{
+    padding:0;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+
+  .task-bar{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0d1828,#1a2942);
+    border-bottom:1px solid rgba(107,122,153,0.3);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .task-bar h3{
+    font-size:.92rem;font-weight:900;color:#22D3EE;
+    display:flex;align-items:center;gap:6px;
+    letter-spacing:.3px;
+  }
+  .task-bar h3 svg{width:16px;height:16px;filter:drop-shadow(0 0 5px rgba(34,211,238,0.6));}
+  .mission-text{
+    margin-right:auto;
+    font-size:.85rem;color:#fff;
+    max-width:600px;
+  }
+  .mission-text strong{color:#F472B6;}
+
+  /* ISO stage */
+  .iso-container{
+    position:relative;
+    width:100%;
+    height:600px;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(34,211,238,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, rgba(168,85,247,0.06) 0%, transparent 60%),
+      linear-gradient(180deg,#050814 0%,#0a1020 100%);
+    perspective:1600px;
+    perspective-origin:50% 40%;
+    overflow:hidden;
+    cursor:grab;
+    user-select:none;
+  }
+  .iso-container:active{cursor:grabbing;}
+  .iso-container.dragging{cursor:grabbing;}
+
+  /* Star field */
+  .iso-container::before{
+    content:'';
+    position:absolute;inset:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 40% 70%, #fff, transparent),
+      radial-gradient(1px 1px at 60% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 80% 50%, #fff, transparent),
+      radial-gradient(1px 1px at 15% 80%, #fff, transparent),
+      radial-gradient(1px 1px at 90% 85%, #fff, transparent),
+      radial-gradient(1px 1px at 35% 15%, #fff, transparent),
+      radial-gradient(1px 1px at 70% 90%, #fff, transparent);
+    opacity:0.5;
+    pointer-events:none;
+    animation:twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle{from{opacity:0.3;}to{opacity:0.7;}}
+
+  .iso-scene{
+    position:absolute;
+    left:50%;top:50%;
+    transform-style:preserve-3d;
+    transform:translate(-50%,-50%) rotateX(58deg) rotateZ(-45deg) scale(1);
+    transition:transform .35s ease;
+    will-change:transform;
+  }
+
+  /* Isometric platform */
+  .iso-platform{
+    position:absolute;
+    left:50%;top:50%;
+    width:600px;height:600px;
+    transform:translate(-50%,-50%) translateZ(0);
+    border-radius:30px;
+    background:
+      linear-gradient(135deg,rgba(28,39,64,0.4) 0%, rgba(11,18,32,0.7) 100%);
+    border:2px solid rgba(34,211,238,0.3);
+    box-shadow:
+      0 0 60px rgba(34,211,238,0.15),
+      inset 0 0 60px rgba(34,211,238,0.05);
+    transform-style:preserve-3d;
+  }
+  .iso-platform::before{
+    content:'';
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.08) 1px, transparent 1px);
+    background-size:40px 40px;
+    border-radius:28px;
+  }
+
+  /* Isometric cube node */
+  .iso-node{
+    position:absolute;
+    transform-style:preserve-3d;
+    cursor:pointer;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .iso-node .cube{
+    position:relative;
+    width:var(--w, 80px);
+    height:var(--h, 60px);
+    transform-style:preserve-3d;
+    transition:all .3s;
+  }
+  .iso-node .cube .face{
+    position:absolute;
+    border:2px solid var(--node-color, #22D3EE);
+    background:linear-gradient(135deg, rgba(28,39,64,0.85), rgba(11,18,32,0.85));
+    box-shadow:
+      0 0 20px var(--node-glow, rgba(34,211,238,0.6)),
+      inset 0 0 20px var(--node-glow, rgba(34,211,238,0.15));
+    display:flex;align-items:center;justify-content:center;
+    color:var(--node-color, #22D3EE);
+    font-weight:800;
+  }
+  .iso-node .cube .face.top{
+    width:100%;height:100%;
+    transform:translateZ(var(--depth, 20px));
+    border-radius:8px;
+  }
+  .iso-node .cube .face.top svg{
+    width:calc(var(--w, 80px) * 0.4);
+    height:calc(var(--w, 80px) * 0.4);
+    filter:drop-shadow(0 0 8px var(--node-glow));
+  }
+  .iso-node .cube .face.left{
+    width:var(--depth, 20px);height:100%;
+    right:100%;top:0;
+    transform-origin:right center;
+    transform:rotateY(-90deg);
+    background:linear-gradient(180deg, rgba(11,18,32,0.9), rgba(5,8,20,0.95));
+  }
+  .iso-node .cube .face.front{
+    width:100%;height:var(--depth, 20px);
+    bottom:100%;left:0;
+    transform-origin:bottom center;
+    transform:rotateX(90deg);
+    background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(5,8,20,0.95));
+  }
+
+  .iso-node .node-label{
+    position:absolute;
+    top:calc(100% + 6px);
+    left:50%;transform:translateX(-50%);
+    background:rgba(11,18,32,0.95);
+    border:1px solid var(--node-color, #22D3EE);
+    color:#fff;
+    font-size:.68rem;
+    font-weight:800;
+    padding:3px 8px;
+    border-radius:8px;
+    white-space:nowrap;
+    box-shadow:0 0 10px var(--node-glow);
+    max-width:180px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .iso-node:hover .cube{transform:translateZ(8px);}
+  .iso-node.valid{
+    animation:validPulse .8s ease;
+  }
+  @keyframes validPulse{
+    0%{filter:drop-shadow(0 0 0 transparent);}
+    50%{filter:drop-shadow(0 0 30px var(--node-glow, #22D3EE));}
+    100%{filter:drop-shadow(0 0 0 transparent);}
+  }
+
+  /* Isometric connection path */
+  .iso-path{
+    position:absolute;
+    height:4px;
+    background:linear-gradient(90deg, var(--path-from, #22D3EE), var(--path-to, #22D3EE));
+    transform-origin:right center;
+    border-radius:2px;
+    box-shadow:0 0 10px var(--path-glow, rgba(34,211,238,0.5));
+    z-index:-1;
+    transform-style:flat;
+  }
+  .iso-path::after{
+    content:'';
+    position:absolute;
+    left:-2px;top:50%;
+    transform:translateY(-50%);
+    border:6px solid transparent;
+    border-right-color:var(--path-to, #22D3EE);
+    filter:drop-shadow(0 0 5px var(--path-glow));
+  }
+  .iso-path.animated{
+    background-size:200% 100%;
+    animation:flowDash 2s linear infinite;
+  }
+  @keyframes flowDash{
+    from{background-position:0% 0;}
+    to{background-position:200% 0;}
+  }
+
+  /* Hints */
+  .iso-hint{
+    position:absolute;bottom:14px;right:16px;
+    background:rgba(11,18,32,0.9);
+    border:1px solid rgba(34,211,238,0.3);
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:.75rem;color:#22D3EE;
+    font-weight:700;
+    display:flex;align-items:center;gap:5px;
+    pointer-events:none;
+    box-shadow:0 0 15px rgba(34,211,238,0.2);
+  }
+  .iso-hint svg{width:13px;height:13px;}
+
+  .iso-badge{
+    position:absolute;top:14px;right:16px;
+    background:rgba(11,18,32,0.9);
+    border:1px solid rgba(34,211,238,0.4);
+    padding:8px 14px;
+    border-radius:14px;
+    font-size:.8rem;font-weight:800;
+    color:#22D3EE;
+    display:flex;align-items:center;gap:6px;
+    box-shadow:0 0 15px rgba(34,211,238,0.2);
+  }
+  .iso-badge svg{width:15px;height:15px;}
+
+  /* Shapes palette */
+  .shapes-palette{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0d1828,#1a2942);
+    border-top:1px solid rgba(107,122,153,0.3);
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  }
+  .shapes-palette .pal-label{
+    font-size:.8rem;color:#22D3EE;font-weight:800;
+    letter-spacing:.3px;margin-left:6px;
+    display:flex;align-items:center;gap:5px;
+  }
+  .shapes-palette .pal-label svg{width:14px;height:14px;}
+  .pal-item{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border:1px solid var(--item-color, rgba(107,122,153,0.4));
+    border-radius:10px;
+    padding:8px 12px;
+    cursor:grab;
+    display:flex;align-items:center;gap:8px;
+    font-size:.78rem;font-weight:800;
+    color:#E2E8F0;
+    transition:all .22s;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
+    user-select:none;
+  }
+  .pal-item:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 18px var(--item-glow, rgba(34,211,238,0.5));
+    border-color:var(--item-color, #22D3EE);
+  }
+  .pal-item.dragging{opacity:.4;}
+  .pal-item .pal-mini{
+    width:30px;height:24px;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--item-color, #22D3EE);
+    filter:drop-shadow(0 0 5px var(--item-glow));
+  }
+  .pal-item .pal-mini svg{width:22px;height:18px;}
+
+  /* Controls */
+  .iso-actions{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0d1828,#1a2942);
+    border-top:1px solid rgba(107,122,153,0.3);
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  }
+  .progress-row{
+    display:flex;align-items:center;gap:10px;flex:1;min-width:200px;
+  }
+  .progress-text{
+    font-size:.82rem;color:#22D3EE;font-weight:800;
+    letter-spacing:.3px;white-space:nowrap;
+  }
+  .progress-bar{
+    flex:1;max-width:340px;height:8px;border-radius:20px;
+    background:rgba(11,18,32,0.7);
+    overflow:hidden;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#22D3EE,#A855F7,#F472B6,#FBBF24);
+    width:0%;transition:width .5s ease;
+    border-radius:20px;
+    box-shadow:0 0 12px rgba(34,211,238,0.6);
+  }
+
+  .btn{
+    font-family:inherit;font-size:.85rem;font-weight:800;
+    border:none;border-radius:10px;
+    padding:9px 18px;cursor:pointer;
+    transition:all .22s;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn svg{width:15px;height:15px;}
+  .btn-cyan{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:0 5px 16px rgba(34,211,238,0.4);
+  }
+  .btn-cyan:hover{box-shadow:0 8px 22px rgba(34,211,238,0.6);transform:translateY(-2px);}
+  .btn-purple{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 5px 16px rgba(168,85,247,0.4);
+  }
+  .btn-purple:hover{box-shadow:0 8px 22px rgba(168,85,247,0.6);transform:translateY(-2px);}
+  .btn-metal{
+    background:linear-gradient(135deg,#2a3752,#1a2235);
+    color:#E2E8F0;
+    border:1px solid rgba(199,208,224,0.3);
+  }
+  .btn-metal:hover{border-color:#22D3EE;box-shadow:0 0 18px rgba(34,211,238,0.3);}
+
+  .act-feedback{
+    margin:14px 18px 18px;
+    padding:14px 18px;border-radius:12px;
+    font-size:.9rem;font-weight:700;display:none;
+    border-right:5px solid #10B981;
+    background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.08));
+    color:#6EE7B7;
+    box-shadow:0 4px 14px rgba(16,185,129,0.15);
+  }
+  .act-feedback.show{display:block;animation:fadeUp .3s;}
+  .act-feedback.err{
+    border-color:#EF4444;
+    background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.08));
+    color:#FCA5A5;
+  }
+
+  /* ===== RESULT PANEL ===== */
+  .result-card{
+    padding:22px 24px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    margin-bottom:16px;
+  }
+  .result-card h2{
+    font-size:1.1rem;font-weight:900;color:#fff;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .result-card h2 svg{color:#FBBF24;filter:drop-shadow(0 0 6px rgba(251,191,36,0.6));}
+
+  .stat-grid{
+    display:grid;gap:12px;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    margin-bottom:16px;
+  }
+  .stat-item{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    border:1px solid rgba(107,122,153,0.3);
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  .stat-item .num{
+    font-size:1.8rem;font-weight:900;
+    background:linear-gradient(135deg,#22D3EE,#A855F7);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    line-height:1.2;
+  }
+  .stat-item .lbl{
+    font-size:.78rem;color:var(--text-light);
+    font-weight:700;margin-top:4px;
+  }
+
+  .summary-box{
+    padding:16px 20px;
+    background:linear-gradient(135deg,rgba(34,211,238,0.1),rgba(168,85,247,0.08));
+    border-right:4px solid #22D3EE;
+    border-radius:12px;
+    font-size:.94rem;
+  }
+  .summary-box h3{
+    font-size:1rem;font-weight:900;color:#22D3EE;margin-bottom:10px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .summary-box ul{list-style:none;padding:0;}
+  .summary-box ul li{
+    padding-right:24px;position:relative;margin-bottom:7px;
+    color:var(--text);
+  }
+  .summary-box ul li::before{
+    content:'★';position:absolute;right:0;color:#FBBF24;
+    filter:drop-shadow(0 0 4px rgba(251,191,36,0.6));
+  }
+
+  /* Tooltip */
+  .ui-tooltip{
+    position:fixed;
+    background:rgba(11,18,32,0.95);
+    color:#22D3EE;
+    padding:6px 12px;
+    border-radius:6px;
+    font-size:.78rem;
+    font-weight:700;
+    pointer-events:none;
+    z-index:1000;
+    opacity:0;
+    transition:opacity .2s;
+    max-width:250px;
+    border:1px solid rgba(34,211,238,0.4);
+    box-shadow:0 4px 14px rgba(34,211,238,0.3);
+  }
+  .ui-tooltip.show{opacity:1;}
+
+  .footer{
+    text-align:center;font-size:.85rem;color:var(--text-dim);
+    padding:26px 20px 30px;margin-top:10px;
+  }
+  .footer span{color:#22D3EE;font-weight:800;text-shadow:0 0 8px rgba(34,211,238,0.5);}
+
+  /* Responsive */
+  @media (max-width:760px){
+    .lesson-head h1{font-size:1.15rem;}
+    .tab-btn{min-width:auto;font-size:.76rem;padding:9px 8px;}
+    .tab-btn svg{width:14px;height:14px;}
+    .iso-container{height:440px;}
+    .iso-scene{transform:translate(-50%,-50%) rotateX(58deg) rotateZ(-45deg) scale(0.65);}
+    .mission-text{font-size:.78rem;width:100%;}
+    .btn{padding:8px 14px;font-size:.8rem;}
+    .pal-item{padding:6px 10px;font-size:.72rem;}
+    .pal-item .pal-mini{width:24px;height:20px;}
+    .pal-item .pal-mini svg{width:18px;height:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">
+      <span class="icon-badge"><i data-lucide="hammer"></i></span>
+      <span>إنشاء مخطط سير عمل تطبيق صيانة</span>
+      <span class="chip">المحطة 5 — التطبيق العملي</span>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="nav-btn"><i data-lucide="home"></i> الرئيسية</a>
+      <a href="05.html" class="nav-btn"><i data-lucide="arrow-right"></i> السابق</a>
+      <a href="07.html" class="nav-btn"><i data-lucide="arrow-left"></i> التالي</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="lesson-head metal-card">
+    <h1><i data-lucide="hammer"></i> إنشاء مخطط سير عمل تطبيق صيانة <span class="badge">المحطة الأخيرة</span></h1>
+    <p>في هذا الدرس ستستخدم تطبيق ديجارام draw.io لإنشاء سير عمل صيانة تطبيق. سيسمح التطبيق لكبار السن الذين يعانون من مشكلات بصرية أو الرعاش بالحصول على معلومات حول الأماكن السياحية. حان الوقت لتطبيق كل ما تعلمته!</p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-panel="about" role="tab"><i data-lucide="info"></i> السياق</button>
+    <button class="tab-btn" data-panel="build" role="tab"><i data-lucide="hammer"></i> ابنِ المخطط</button>
+    <button class="tab-btn" data-panel="result" role="tab"><i data-lucide="bar-chart-3"></i> تحليل</button>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="panel active" id="panel-about">
+    <div class="about-card">
+      <h2><i data-lucide="story"></i> القصة</h2>
+      <div class="story-box">
+        <strong>السياق:</strong> تطبيق سياحي يساعد كبار السن الذين يعانون من مشكلات بصرية أو الرعاش على الحصول على معلومات حول الأماكن السياحية. أنت الآن مطوّر مسؤول عن <strong>صيانة هذا التطبيق</strong>، ومهمتك بناء مخطط سير عمل يوضح رحلة الطلبات من الاستقبال حتى الإغلاق.
+      </div>
+
+      <h2 style="margin-top:16px"><i data-lucide="git-branch"></i> المسارات الخمسة</h2>
+      <p>عند وصول «طلب الحصول على تحديثات التطبيق»، يتفرع المخطط إلى 5 مسارات رئيسية:</p>
+
+      <div class="paths-grid">
+        <div class="path-card" style="--path-color:#38BDF8;--path-glow:rgba(56,189,248,0.5);">
+          <div class="pc-icon"><i data-lucide="cpu"></i></div>
+          <h4>مشكلة تقنية</h4>
+          <p>إصلاح مشكلات الخلل البرمجي</p>
+        </div>
+        <div class="path-card" style="--path-color:#A855F7;--path-glow:rgba(168,85,247,0.5);">
+          <div class="pc-icon"><i data-lucide="sparkles"></i></div>
+          <h4>مشاكل الميزات</h4>
+          <p>حذف متطلبات الأجهزة + إصلاح مشكلات الأمان</p>
+        </div>
+        <div class="path-card" style="--path-color:#FBBF24;--path-glow:rgba(251,191,36,0.5);">
+          <div class="pc-icon"><i data-lucide="star"></i></div>
+          <h4>مشاكل المزايا</h4>
+          <p>إصلاح المزايا + إضافة ميزات جديدة</p>
+        </div>
+        <div class="path-card" style="--path-color:#F472B6;--path-glow:rgba(244,114,182,0.5);">
+          <div class="pc-icon"><i data-lucide="palette"></i></div>
+          <h4>مشكلة التصميم</h4>
+          <p>تحسين واجهة المستخدم وتجربة المستخدم</p>
+        </div>
+        <div class="path-card" style="--path-color:#10B981;--path-glow:rgba(16,185,129,0.5);">
+          <div class="pc-icon"><i data-lucide="smartphone"></i></div>
+          <h4>مشاكل الأجهزة</h4>
+          <p>تعديل المسارات</p>
+        </div>
+      </div>
+
+      <h2 style="margin-top:16px"><i data-lucide="git-merge"></i> نقطة القرار</h2>
+      <p>جميع المسارات تلتقي عند قرار واحد: <strong style="color:#FBBF24">«هل تم حل المشكلات؟»</strong></p>
+      <ul style="list-style:none;padding-right:0;margin-top:8px;">
+        <li style="padding-right:24px;position:relative;margin-bottom:6px;"><span style="position:absolute;right:0;color:#10B981;font-weight:900;">✔</span> <strong>نعم:</strong> إنهاء المهمة والانتقال لنسخة التطبيق الجديدة.</li>
+        <li style="padding-right:24px;position:relative;"><span style="position:absolute;right:0;color:#EF4444;font-weight:900;">✘</span> <strong>لا:</strong> إنشاء تقرير الخطأ وإعادة المحاولة.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ BUILD ============ -->
+  <section class="panel" id="panel-build">
+    <div class="stage-wrap">
+
+      <div class="task-bar">
+        <h3><i data-lucide="target"></i> المهمة الحالية</h3>
+        <div class="mission-text" id="missionText">ابدأ بإسقاط <strong>مكعب «طلب الحصول على تحديثات التطبيق»</strong> (البيضاوي) في مركز المنصة.</div>
+      </div>
+
+      <div class="iso-container" id="isoContainer">
+        <div class="iso-scene" id="isoScene">
+          <div class="iso-platform"></div>
+          <!-- nodes injected by JS -->
+        </div>
+
+        <div class="iso-badge">
+          <i data-lucide="layers"></i>
+          <span id="nodeCount">0 / 9 عقدة</span>
+        </div>
+
+        <div class="iso-hint">
+          <i data-lucide="move-horizontal"></i>
+          اسحب للتدوير • انقر على مكعب لإبرازه
+        </div>
+      </div>
+
+      <div class="shapes-palette">
+        <span class="pal-label"><i data-lucide="box"></i> الأشكال المتاحة:</span>
+        <div class="pal-item" data-shape="start" style="--item-color:#22D3EE;--item-glow:rgba(34,211,238,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="circle"></i></span>
+          <span>البداية</span>
+        </div>
+        <div class="pal-item" data-shape="tech" style="--item-color:#38BDF8;--item-glow:rgba(56,189,248,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="cpu"></i></span>
+          <span>مشكلة تقنية</span>
+        </div>
+        <div class="pal-item" data-shape="feature" style="--item-color:#A855F7;--item-glow:rgba(168,85,247,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="sparkles"></i></span>
+          <span>مشاكل الميزات</span>
+        </div>
+        <div class="pal-item" data-shape="advantage" style="--item-color:#FBBF24;--item-glow:rgba(251,191,36,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="star"></i></span>
+          <span>مشاكل المزايا</span>
+        </div>
+        <div class="pal-item" data-shape="design" style="--item-color:#F472B6;--item-glow:rgba(244,114,182,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="palette"></i></span>
+          <span>مشكلة التصميم</span>
+        </div>
+        <div class="pal-item" data-shape="device" style="--item-color:#10B981;--item-glow:rgba(16,185,129,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="smartphone"></i></span>
+          <span>مشاكل الأجهزة</span>
+        </div>
+        <div class="pal-item" data-shape="decision" style="--item-color:#FBBF24;--item-glow:rgba(251,191,36,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="diamond"></i></span>
+          <span>القرار</span>
+        </div>
+        <div class="pal-item" data-shape="end" style="--item-color:#22D3EE;--item-glow:rgba(34,211,238,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="check-circle"></i></span>
+          <span>النهاية</span>
+        </div>
+        <div class="pal-item" data-shape="report" style="--item-color:#F97316;--item-glow:rgba(249,115,22,0.6);" draggable="true">
+          <span class="pal-mini"><i data-lucide="file-text"></i></span>
+          <span>تقرير الخطأ</span>
+        </div>
+      </div>
+
+      <div class="iso-actions">
+        <div class="progress-row">
+          <span class="progress-text" id="progressText">0 من 5 مهام</span>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <button class="btn btn-cyan" id="checkBtn"><i data-lucide="check-circle"></i> تحقق من المهمة</button>
+        <button class="btn btn-metal" id="resetBtn"><i data-lucide="rotate-ccw"></i> إعادة</button>
+      </div>
+
+      <div class="act-feedback" id="buildFb"></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section class="panel" id="panel-result">
+    <div class="result-card">
+      <h2><i data-lucide="bar-chart-3"></i> تحليل المخطط النهائي</h2>
+
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="num" id="statNodes">0</div>
+          <div class="lbl">عقدة مكتملة</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="statPaths">0</div>
+          <div class="lbl">مسار مرتبط</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="statTasks">0</div>
+          <div class="lbl">مهمة مكتملة</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="statPercent">0%</div>
+          <div class="lbl">نسبة الإتمام</div>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3><i data-lucide="star"></i> ما تعلمته في هذه الرحلة</h3>
+        <ul>
+          <li>المخطط تمثيل مرئي للمعلومات باستخدام الأشكال والأسهم.</li>
+          <li>مخطط سير العمل يوضح تدفق المهام في دورة حياة النظام.</li>
+          <li>هناك 4 أنواع رئيسية للمخططات: سير العمل، حالة الاستخدام، الشجرة، الهيكلي.</li>
+          <li>الأشكال الأساسية: بيضاوي (البداية)، مستطيل (العملية)، معين (القرار)، مستند، متوازي، سهم.</li>
+          <li>تطبيق draw.io يتيح إنشاء المخططات بالسحب والإفلات، مع تخصيص الخط (Tahoma) والحجم (24pt).</li>
+          <li>الحفظ بـ Ctrl+S، والتصدير PDF عبر File → Export As.</li>
+          <li>المخططات التفاعلية تساعد على فهم العلاقات والقرارات المتفرعة.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">فكرة وتصميم <span>محمد مجممي</span></footer>
+
+<div class="ui-tooltip" id="uiTooltip"></div>
+
+<script>
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    if(window.lucide) lucide.createIcons();
+    if(btn.dataset.panel === 'result') updateStats();
+  });
+});
+
+/* ============ NODES DATA ============ */
+const NODES = [
+  {id:'start',  label:'طلب الحصول على تحديثات التطبيق', x:-45, y:-45, w:110, h:70, depth:28, color:'#22D3EE', icon:'circle', task:1},
+  {id:'tech',   label:'مشكلة تقنية',        x:-200, y:  80, w:90,  h:60, depth:22, color:'#38BDF8', icon:'cpu',       task:2},
+  {id:'feature',label:'مشاكل الميزات',      x:-100, y: 100, w:90,  h:60, depth:22, color:'#A855F7', icon:'sparkles',  task:2},
+  {id:'advantage',label:'مشاكل المزايا',    x:  10, y: 100, w:90,  h:60, depth:22, color:'#FBBF24', icon:'star',      task:2},
+  {id:'design', label:'مشكلة التصميم',      x: 120, y:  80, w:90,  h:60, depth:22, color:'#F472B6', icon:'palette',   task:2},
+  {id:'device', label:'مشاكل الأجهزة',      x: 220, y:  40, w:90,  h:60, depth:22, color:'#10B981', icon:'smartphone',task:2},
+  {id:'decision',label:'هل تم حل المشكلات؟',x:  -5, y: 210, w:120, h:80, depth:26, color:'#FBBF24', icon:'help-circle',task:3},
+  {id:'end',    label:'إنهاء المهمة',       x:-160, y: 320, w:90,  h:60, depth:22, color:'#22D3EE', icon:'check-circle',task:4},
+  {id:'report', label:'تقرير الخطأ',        x: 140, y: 320, w:90,  h:60, depth:22, color:'#F97316', icon:'file-text', task:4}
+];
+
+/* Connection map: [from, to] */
+const CONNECTIONS = [
+  ['start','tech'],
+  ['start','feature'],
+  ['start','advantage'],
+  ['start','design'],
+  ['start','device'],
+  ['tech','decision'],
+  ['feature','decision'],
+  ['advantage','decision'],
+  ['design','decision'],
+  ['device','decision'],
+  ['decision','end'],
+  ['decision','report']
+];
+
+/* ============ STATE ============ */
+const isoScene = document.getElementById('isoScene');
+const isoContainer = document.getElementById('isoContainer');
+let placedNodes = {};  // id -> element
+let placedConnections = new Set();
+let currentTask = 1;
+let tasksDone = {1:false,2:false,3:false,4:false,5:false};
+const nodeEls = {};
+
+/* ============ BUILD NODES (visual preview on scene) ============ */
+function buildAllNodes(){
+  NODES.forEach(n=>{
+    const el = document.createElement('div');
+    el.className = 'iso-node';
+    el.dataset.nodeId = n.id;
+    el.style.left = '50%';
+    el.style.top = '50%';
+    el.style.transform = `translate(-50%,-50%) translate(${n.x}px, ${n.y}px)`;
+    el.style.setProperty('--node-color', n.color);
+    el.style.setProperty('--node-glow', hexToRgba(n.color, 0.6));
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+    el.style.transition = 'opacity .4s ease, transform .35s ease';
+
+    el.innerHTML = `
+      <div class="cube" style="--w:${n.w}px;--h:${n.h}px;--depth:${n.depth}px;">
+        <div class="face top">
+          <i data-lucide="${n.icon}"></i>
+        </div>
+        <div class="face left"></div>
+        <div class="face front"></div>
+      </div>
+      <span class="node-label">${n.label}</span>
+    `;
+    isoScene.appendChild(el);
+    nodeEls[n.id] = el;
+
+    el.addEventListener('click',()=>{
+      if(el.style.opacity === '1'){
+        el.classList.add('valid');
+        setTimeout(()=>el.classList.remove('valid'), 800);
+        showTooltip(n.label, el);
+      }
+    });
+  });
+  if(window.lucide) lucide.createIcons();
+}
+
+function hexToRgba(hex, a){
+  const c = hex.replace('#','');
+  const r = parseInt(c.substring(0,2),16);
+  const g = parseInt(c.substring(2,4),16);
+  const b = parseInt(c.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ============ SHOW NODE (as student places it) ============ */
+function revealNode(id){
+  const el = nodeEls[id];
+  if(!el) return;
+  el.style.opacity = '1';
+  el.style.pointerEvents = 'auto';
+  placedNodes[id] = el;
+  updateNodeCount();
+}
+
+function updateNodeCount(){
+  document.getElementById('nodeCount').textContent = `${Object.keys(placedNodes).length} / ${NODES.length} عقدة`;
+}
+
+/* ============ CONNECTIONS ============ */
+function buildConnection(fromId, toId){
+  const key = fromId + '->' + toId;
+  if(placedConnections.has(key)) return;
+  const fromEl = nodeEls[fromId];
+  const toEl = nodeEls[toId];
+  if(!fromEl || !toEl) return;
+
+  const fromNode = NODES.find(n=>n.id===fromId);
+  const toNode = NODES.find(n=>n.id===toId);
+
+  const fromX = fromNode.x;
+  const fromY = fromNode.y;
+  const toX = toNode.x;
+  const toY = toNode.y;
+
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const dist = Math.sqrt(dx*dx + dy*dy) - 60;
+  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+  const path = document.createElement('div');
+  path.className = 'iso-path animated';
+  path.style.width = dist + 'px';
+  path.style.left = '50%';
+  path.style.top = '50%';
+  path.style.transform = `translate(${fromX}px, ${fromY}px) translate(30px, 30px) rotate(${angle}deg)`;
+  path.style.transformOrigin = '0 50%';
+  path.style.setProperty('--path-from', fromNode.color);
+  path.style.setProperty('--path-to', toNode.color);
+  path.style.setProperty('--path-glow', hexToRgba(toNode.color, 0.5));
+
+  isoScene.appendChild(path);
+  placedConnections.add(key);
+}
+
+/* ============ TASK SYSTEM ============ */
+const TASKS = {
+  1:{
+    text: 'ابدأ بإسقاط <strong>مكعب «طلب الحصول على تحديثات التطبيق»</strong> (البداية) في مركز المنصة.',
+    required: ['start'],
+    minConnections: 0,
+    onComplete: '✓ رائع! البداية موضوعة. الآن اسحب <strong>المسارات الخمسة</strong> من اللوحة السفلية.',
+    fail: 'اسحب «البداية» من لوحة الأشكال إلى مركز المنصة (أو انقر عليها).'
+  },
+  2:{
+    text: 'اسحب <strong>المسارات الخمسة</strong>: مشكلة تقنية، ميزات، مزايا، تصميم، أجهزة.',
+    required: ['tech','feature','advantage','design','device'],
+    minConnections: 5,
+    onComplete: '✓ ممتاز! ربطت المسارات الخمسة بالبداية. الآن أضف <strong>القرار</strong> في المنتصف السفلي.',
+    fail: 'أضف المسارات الخمسة واربطها بالبداية. (المطلوب 5 مسارات + 5 روابط)'
+  },
+  3:{
+    text: 'أضف <strong>مكعب القرار</strong> «هل تم حل المشكلات؟» ثم اربطه بالمسارات الخمسة.',
+    required: ['decision'],
+    minConnections: 10,
+    onComplete: '✓ أحسنت! القرار مرتبط بجميع المسارات. الآن أضف <strong>النهاية</strong> و<strong>تقرير الخطأ</strong> كمخرجين.',
+    fail: 'أضف «القرار» واربطه بالمسارات الخمسة. (المطلوب 10 روابط)'
+  },
+  4:{
+    text: 'أضف <strong>النهاية</strong> (نعم) و<strong>تقرير الخطأ</strong> (لا) كمخرجين للقرار.',
+    required: ['end','report'],
+    minConnections: 12,
+    onComplete: '✓ اكتمل المخطط! جميع العقد والروابط في مكانها. جاهز للتحليل.',
+    fail: 'أضف «النهاية» و«تقرير الخطأ»، ثم اربطهما بالقرار. (المطلوب 12 رابطًا)'
+  },
+  5:{
+    text: 'جميع العقد والروابط مكتملة. اضغط على «تحليل» لعرض النتيجة النهائية.',
+    required: NODES.map(n=>n.id),
+    minConnections: CONNECTIONS.length,
+    onComplete: '🎉 أكملت جميع المهام! انتقل إلى تبويب «تحليل».',
+    fail: 'أكمل بناء جميع العقد والروابط.'
+  }
+};
+
+function getNodeCount(){ return Object.keys(placedNodes).length; }
+function getConnectionCount(){ return placedConnections.size; }
+
+/* auto-connect all pairs when both endpoints are placed */
+function autoConnectAvailable(){
+  CONNECTIONS.forEach(([from, to])=>{
+    if(placedNodes[from] && placedNodes[to]){
+      buildConnection(from, to);
+    }
+  });
+}
+
+function checkTask(manual = false){
+  const t = TASKS[currentTask];
+  const nodeOk = t.required.every(id=>placedNodes[id]);
+  const connOk = getConnectionCount() >= t.minConnections;
+
+  if(nodeOk && connOk){
+    tasksDone[currentTask] = true;
+    const fb = document.getElementById('buildFb');
+    fb.className = 'act-feedback show';
+    fb.innerHTML = t.onComplete;
+
+    if(currentTask < 5){
+      currentTask++;
+      updateMission();
+      updateProgress();
+    } else {
+      updateProgress();
+    }
+    return true;
+  } else if(manual){
+    const fb = document.getElementById('buildFb');
+    fb.className = 'act-feedback err show';
+    fb.innerHTML = '⚠ ' + t.fail;
+    return false;
+  }
+  return false;
+}
+
+function updateMission(){
+  const t = TASKS[currentTask];
+  document.getElementById('missionText').innerHTML = t.text;
+}
+
+function updateProgress(){
+  let done = 0;
+  for(let i=1;i<=5;i++) if(tasksDone[i]) done++;
+  document.getElementById('progressText').textContent = `${done} من 5 مهام`;
+  document.getElementById('progressFill').style.width = (done/5*100) + '%';
+}
+
+/* ============ DRAG & DROP from palette ============ */
+document.querySelectorAll('.pal-item').forEach(item=>{
+  item.addEventListener('dragstart',(e)=>{
+    e.dataTransfer.setData('text/plain','node:' + item.dataset.shape);
+    item.classList.add('dragging');
+  });
+  item.addEventListener('dragend',()=>item.classList.remove('dragging'));
+  // fallback: click to place
+  item.addEventListener('click',()=>{
+    placeFromPalette(item.dataset.shape);
+  });
+});
+
+function placeFromPalette(id){
+  const node = NODES.find(n=>n.id===id);
+  if(!node) return;
+  if(placedNodes[id]) {
+    // already placed -> just pulse
+    const el = nodeEls[id];
+    if(el){
+      el.classList.add('valid');
+      setTimeout(()=>el.classList.remove('valid'), 800);
+    }
+    return;
+  }
+  revealNode(id);
+  autoConnectAvailable();
+  checkTask();
+}
+
+isoContainer.addEventListener('dragover',(e)=>{
+  e.preventDefault();
+  isoContainer.style.outline = '2px dashed #22D3EE';
+  isoContainer.style.outlineOffset = '-8px';
+});
+isoContainer.addEventListener('dragleave',()=>{
+  isoContainer.style.outline = 'none';
+});
+isoContainer.addEventListener('drop',(e)=>{
+  e.preventDefault();
+  isoContainer.style.outline = 'none';
+  const data = e.dataTransfer.getData('text/plain');
+  if(!data.startsWith('node:')) return;
+  const id = data.substring(5);
+  placeFromPalette(id);
+});
+
+/* ============ DRAG TO ROTATE ============ */
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let baseRotZ = -45;
+let baseRotX = 58;
+
+isoContainer.addEventListener('pointerdown',(e)=>{
+  if(e.target.closest('.iso-node')) return;
+  isDragging = true;
+  startX = e.clientX;
+  startY = e.clientY;
+  isoContainer.classList.add('dragging');
+  isoContainer.setPointerCapture(e.pointerId);
+});
+isoContainer.addEventListener('pointermove',(e)=>{
+  if(!isDragging) return;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  const rotZ = baseRotZ + dx * 0.3;
+  const rotX = Math.max(35, Math.min(75, baseRotX - dy * 0.15));
+  isoScene.style.transform = `translate(-50%,-50%) rotateX(${rotX}deg) rotateZ(${rotZ}deg) scale(1)`;
+});
+isoContainer.addEventListener('pointerup',()=>{
+  isDragging = false;
+  isoContainer.classList.remove('dragging');
+});
+isoContainer.addEventListener('pointercancel',()=>{
+  isDragging = false;
+  isoContainer.classList.remove('dragging');
+});
+
+/* ============ RESET ============ */
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(!confirm('إعادة البناء من البداية؟')) return;
+  placedNodes = {};
+  placedConnections = new Set();
+  currentTask = 1;
+  tasksDone = {1:false,2:false,3:false,4:false,5:false};
+
+  NODES.forEach(n=>{
+    const el = nodeEls[n.id];
+    if(el){
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+    }
+  });
+  document.querySelectorAll('.iso-path').forEach(p=>p.remove());
+
+  document.getElementById('buildFb').className = 'act-feedback';
+  updateMission();
+  updateProgress();
+  updateNodeCount();
+});
+
+document.getElementById('checkBtn').addEventListener('click',()=>{
+  checkTask(true);
+});
+
+/* ============ STATS ============ */
+function updateStats(){
+  const nodes = getNodeCount();
+  const paths = getConnectionCount();
+  let tasks = 0;
+  for(let i=1;i<=5;i++) if(tasksDone[i]) tasks++;
+  const percent = Math.round((nodes / NODES.length) * 100);
+  document.getElementById('statNodes').textContent = nodes;
+  document.getElementById('statPaths').textContent = paths;
+  document.getElementById('statTasks').textContent = tasks;
+  document.getElementById('statPercent').textContent = percent + '%';
+}
+
+/* ============ TOOLTIP ============ */
+const tooltip = document.getElementById('uiTooltip');
+function showTooltip(text, el){
+  const rect = el.getBoundingClientRect();
+  tooltip.textContent = text;
+  tooltip.style.left = (rect.left + rect.width/2 - 80) + 'px';
+  tooltip.style.top = (rect.top - 36) + 'px';
+  tooltip.classList.add('show');
+  clearTimeout(showTooltip._t);
+  showTooltip._t = setTimeout(()=>tooltip.classList.remove('show'), 1800);
+}
+
+/* ============ INIT ============ */
+buildAllNodes();
+updateMission();
+updateProgress();
+updateNodeCount();
+if(window.lucide) lucide.createIcons();
+setTimeout(()=>{ if(window.lucide) lucide.createIcons(); }, 300);
+</script>
+</body>
+</html>

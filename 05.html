@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق ديجارام draw.io — إنشاء المخطط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg-0:#0B1220;
+    --bg-1:#131C2E;
+    --bg-2:#1C2740;
+    --metal-1:#6B7A99;
+    --metal-2:#C7D0E0;
+    --neon-cyan:#22D3EE;
+    --neon-blue:#38BDF8;
+    --neon-green:#10B981;
+    --neon-purple:#A855F7;
+    --neon-orange:#F97316;
+    --neon-pink:#F472B6;
+    --text:#E2E8F0;
+    --text-light:#94A3B8;
+    --text-dim:#64748B;
+
+    /* draw.io colors */
+    --dio-bg:#f5f5f5;
+    --dio-panel:#ffffff;
+    --dio-border:#d0d0d0;
+    --dio-canvas:#ffffff;
+    --dio-grid:#ececec;
+    --dio-text:#333333;
+    --dio-blue:#1d8cf8;
+    --dio-blue-dark:#0d6efd;
+    --dio-hover:#e8f0fe;
+    --dio-selected:#d6e8ff;
+    --dio-tooltip:#000000cc;
+
+    --shadow-card:
+      0 10px 30px rgba(0,0,0,0.55),
+      0 2px 6px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    --border-metal: linear-gradient(135deg,#6B7A99 0%,#C7D0E0 45%,#8B9AB8 60%,#6B7A99 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(34,211,238,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 100%, rgba(168,85,247,0.08) 0%, transparent 45%),
+      linear-gradient(180deg,var(--bg-0) 0%,var(--bg-1) 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+    background-size:52px 52px;
+    pointer-events:none;z-index:0;
+  }
+  body > *{position:relative;z-index:1;}
+
+  .metal-card{
+    position:relative;
+    background:linear-gradient(135deg,var(--bg-2) 0%,var(--bg-1) 100%);
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid transparent;
+    background-clip:padding-box;
+  }
+  .metal-card::before{
+    content:'';position:absolute;inset:-2px;
+    border-radius:20px;background:var(--border-metal);
+    z-index:-1;opacity:0.55;
+  }
+  .metal-card::after{
+    content:'';position:absolute;inset:0;border-radius:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 30%);
+    pointer-events:none;
+  }
+
+  /* TOPBAR */
+  .topbar{
+    padding:16px 20px;
+    background:linear-gradient(135deg,#0d1828 0%,#1a2942 50%,#0d1828 100%);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,#22D3EE 0%,#A855F7 50%,#F472B6 100%) 1;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 6px 30px rgba(34,211,238,0.15);
+  }
+  .topbar-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+  }
+  .topbar-title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1rem;color:#fff;}
+  .topbar-title .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(34,211,238,0.5);
+  }
+  .topbar-title .icon-badge svg{width:20px;height:20px;color:#0B1220;}
+  .topbar-title .chip{
+    background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(168,85,247,0.2));
+    border:1px solid rgba(34,211,238,0.4);
+    padding:4px 12px;border-radius:20px;
+    font-size:.74rem;font-weight:700;color:#22D3EE;
+    text-shadow:0 0 8px rgba(34,211,238,0.5);
+  }
+  .nav-buttons{display:flex;gap:8px;flex-wrap:wrap;}
+  .nav-btn{
+    background:linear-gradient(135deg,rgba(107,122,153,0.25),rgba(199,208,224,0.15));
+    border:1px solid rgba(199,208,224,0.3);
+    color:#E2E8F0;text-decoration:none;
+    padding:7px 14px;border-radius:10px;
+    font-size:.85rem;font-weight:700;font-family:inherit;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .22s;cursor:pointer;
+    backdrop-filter:blur(6px);
+  }
+  .nav-btn:hover{border-color:#22D3EE;box-shadow:0 0 15px rgba(34,211,238,0.35);transform:translateY(-1px);}
+  .nav-btn svg{width:15px;height:15px;}
+
+  .container{max-width:1180px;margin:0 auto;padding:22px 20px 0;}
+
+  .lesson-head{padding:22px 24px;margin-bottom:18px;}
+  .lesson-head h1{
+    font-size:1.5rem;font-weight:900;
+    display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;
+    color:#fff;
+  }
+  .lesson-head h1 .badge{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;font-size:.72rem;font-weight:800;
+    padding:4px 12px;border-radius:20px;
+    box-shadow:0 0 15px rgba(168,85,247,0.4);
+  }
+  .lesson-head p{font-size:.96rem;color:var(--text-light);}
+
+  /* TABS */
+  .tabs{
+    display:flex;gap:6px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:14px;padding:6px;margin-bottom:16px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    flex:1;min-width:130px;border:none;background:transparent;
+    font-family:inherit;font-size:.9rem;font-weight:800;
+    color:var(--text-light);padding:11px 14px;border-radius:10px;
+    cursor:pointer;transition:all .25s;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    white-space:nowrap;
+  }
+  .tab-btn svg{width:17px;height:17px;}
+  .tab-btn:hover{background:rgba(34,211,238,0.08);color:#22D3EE;}
+  .tab-btn.active{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:0 0 20px rgba(34,211,238,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="sim"].active{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 0 20px rgba(168,85,247,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="tips"].active{
+    background:linear-gradient(135deg,#FBBF24,#F97316);
+    color:#0B1220;
+    box-shadow:0 0 20px rgba(251,191,36,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ============ ABOUT PANEL ============ */
+  .about-card{
+    padding:22px 24px;margin-bottom:16px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+  }
+  .about-card h2{
+    font-size:1.12rem;font-weight:900;color:#fff;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .about-card h2 svg{color:#22D3EE;filter:drop-shadow(0 0 6px rgba(34,211,238,0.6));}
+  .about-card p{font-size:.95rem;color:var(--text);margin-bottom:10px;}
+  .about-card ul{list-style:none;padding:0;}
+  .about-card ul li{
+    padding-right:26px;position:relative;margin-bottom:8px;
+    font-size:.93rem;color:var(--text);
+  }
+  .about-card ul li::before{
+    content:'◆';position:absolute;right:4px;top:4px;
+    color:#22D3EE;font-size:.85rem;
+    filter:drop-shadow(0 0 4px rgba(34,211,238,0.6));
+  }
+  .links-row{
+    display:grid;gap:12px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    margin-top:14px;
+  }
+  .link-card{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border:1px solid rgba(107,122,153,0.3);
+    border-radius:12px;
+    padding:14px 16px;
+    text-decoration:none;
+    color:var(--text);
+    display:flex;align-items:center;gap:12px;
+    transition:all .25s;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  .link-card:hover{
+    border-color:#22D3EE;
+    transform:translateY(-3px);
+    box-shadow:0 10px 24px rgba(34,211,238,0.25);
+  }
+  .link-card .lc-icon{
+    width:44px;height:44px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+  }
+  .link-card .lc-icon svg{width:22px;height:22px;color:#fff;}
+  .link-card .lc-text h4{font-size:.92rem;font-weight:800;color:#fff;margin-bottom:2px;}
+  .link-card .lc-text p{font-size:.76rem;color:var(--text-light);line-height:1.4;}
+  .link-card .lc-arrow{margin-right:auto;color:var(--text-light);}
+  .link-card .lc-arrow svg{width:18px;height:18px;}
+
+  /* ============ SIM PANEL ============ */
+  .sim-wrap{
+    padding:0;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+
+  .tasks-bar{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0d1828,#1a2942);
+    border-bottom:1px solid rgba(107,122,153,0.3);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .tasks-bar h3{
+    font-size:.92rem;font-weight:900;color:#22D3EE;
+    display:flex;align-items:center;gap:6px;
+    letter-spacing:.3px;
+  }
+  .tasks-bar h3 svg{width:16px;height:16px;filter:drop-shadow(0 0 5px rgba(34,211,238,0.6));}
+  .task-chips{
+    display:flex;gap:6px;flex-wrap:wrap;margin-right:auto;
+  }
+  .task-chip{
+    background:rgba(107,122,153,0.2);
+    border:1px solid rgba(107,122,153,0.4);
+    padding:5px 12px;border-radius:20px;
+    font-size:.72rem;font-weight:800;color:var(--text-light);
+    display:flex;align-items:center;gap:5px;
+    transition:all .25s;
+  }
+  .task-chip .num{
+    width:18px;height:18px;border-radius:50%;
+    background:rgba(107,122,153,0.4);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.68rem;
+  }
+  .task-chip.active{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;border-color:transparent;
+    box-shadow:0 0 14px rgba(34,211,238,0.5);
+  }
+  .task-chip.active .num{background:rgba(0,0,0,0.2);}
+  .task-chip.done{
+    background:linear-gradient(135deg,#10B981,#059669);
+    color:#fff;border-color:transparent;
+    box-shadow:0 0 14px rgba(16,185,129,0.5);
+  }
+  .task-chip.done .num{background:rgba(0,0,0,0.2);}
+
+  .mission-banner{
+    padding:12px 18px;
+    background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(244,114,182,0.1));
+    border-bottom:1px solid rgba(168,85,247,0.25);
+    font-size:.9rem;color:#fff;
+    display:flex;align-items:center;gap:10px;
+  }
+  .mission-banner svg{color:#F472B6;flex:0 0 auto;filter:drop-shadow(0 0 6px rgba(244,114,182,0.6));}
+  .mission-banner strong{color:#F472B6;}
+
+  /* DRAW.IO MOCKUP */
+  .dio{
+    background:var(--dio-bg);
+    color:var(--dio-text);
+    font-family:'Segoe UI','Tajawal',sans-serif;
+    border-radius:0;
+    user-select:none;
+    direction:ltr;
+  }
+  .dio-topbar{
+    background:#fafafa;
+    border-bottom:1px solid var(--dio-border);
+    padding:6px 12px;
+    display:flex;align-items:center;gap:14px;
+    font-size:12px;
+    color:#444;
+    min-height:34px;
+  }
+  .dio-topbar .menu-item{
+    padding:4px 8px;border-radius:4px;
+    cursor:pointer;
+    font-weight:500;
+    transition:all .15s;
+  }
+  .dio-topbar .menu-item:hover{background:var(--dio-hover);}
+  .dio-topbar .file-name{
+    margin-left:auto;
+    color:#666;
+    font-size:11px;
+    font-style:italic;
+  }
+
+  .dio-body{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    min-height:460px;
+  }
+  @media (max-width:820px){
+    .dio-body{grid-template-columns:1fr;}
+    .dio-shapes{
+      max-height:140px !important;
+      border-left:none !important;
+      border-bottom:1px solid var(--dio-border);
+    }
+  }
+
+  .dio-shapes{
+    background:var(--dio-panel);
+    border-left:1px solid var(--dio-border);
+    padding:8px;
+    overflow-y:auto;
+    max-height:520px;
+  }
+  .dio-shapes h4{
+    font-size:11px;color:#666;font-weight:600;
+    text-transform:uppercase;letter-spacing:.5px;
+    margin-bottom:8px;padding:4px 2px;
+    border-bottom:1px solid #ececec;
+  }
+  .shape-group{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:4px;margin-bottom:10px;
+  }
+  .dio-shape{
+    aspect-ratio:1;
+    background:#fff;
+    border:1px solid #e0e0e0;
+    border-radius:4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:grab;
+    transition:all .18s;
+    padding:4px;
+  }
+  .dio-shape:hover{
+    border-color:var(--dio-blue);
+    background:var(--dio-hover);
+    box-shadow:0 2px 6px rgba(29,140,248,0.2);
+  }
+  .dio-shape.dragging{opacity:.4;}
+  .dio-shape svg{width:100%;height:100%;max-width:36px;max-height:36px;}
+  .dio-shape .sh-label{
+    display:none;
+  }
+
+  .dio-canvas-wrap{
+    position:relative;
+    background:var(--dio-canvas);
+    min-height:460px;
+    overflow:hidden;
+  }
+  .dio-canvas{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(#ececec 1px, transparent 1px),
+      linear-gradient(90deg, #ececec 1px, transparent 1px);
+    background-size:20px 20px;
+  }
+  .dio-canvas.drag-over{
+    background-color:#f0f8ff;
+    outline:2px dashed var(--dio-blue);
+    outline-offset:-8px;
+  }
+
+  .dio-canvas .empty-hint{
+    position:absolute;
+    inset:0;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:8px;
+    color:#bbb;font-size:13px;font-weight:500;
+    pointer-events:none;
+  }
+  .dio-canvas .empty-hint svg{width:48px;height:48px;opacity:.4;}
+  .dio-canvas.has-shapes .empty-hint{display:none;}
+
+  /* Shape elements inside canvas */
+  .dio-el{
+    position:absolute;
+    cursor:move;
+    transition:filter .2s;
+    z-index:5;
+  }
+  .dio-el.selected{filter:drop-shadow(0 0 0 2px var(--dio-blue));}
+  .dio-el svg{width:100%;height:100%;display:block;}
+  .dio-el .el-text{
+    position:absolute;
+    inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+    color:#333;
+    pointer-events:none;
+    text-align:center;
+    padding:4px;
+    font-family:'Tahoma','Tajawal',sans-serif;
+    overflow:hidden;
+    word-break:break-word;
+  }
+  .dio-el .el-text[contenteditable="true"]{
+    pointer-events:auto;
+    outline:2px solid var(--dio-blue);
+    background:rgba(255,255,255,0.9);
+    cursor:text;
+  }
+  .dio-el .del-btn{
+    position:absolute;top:-8px;left:-8px;
+    width:18px;height:18px;border-radius:50%;
+    background:#dc3545;color:#fff;border:none;
+    font-size:12px;font-weight:700;
+    cursor:pointer;display:none;
+    align-items:center;justify-content:center;
+    line-height:1;
+    box-shadow:0 2px 6px rgba(220,53,69,0.4);
+  }
+  .dio-el:hover .del-btn{display:flex;}
+
+  /* Mini connection dots for directional connector */
+  .dio-el .connector-dot{
+    position:absolute;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--dio-blue);
+    border:2px solid #fff;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 1px 3px rgba(0,0,0,0.2);
+    display:none;
+    z-index:20;
+  }
+  .dio-el.connector-mode .connector-dot{display:block;cursor:crosshair;}
+  .dio-el.connector-target .connector-dot{
+    display:block;
+    background:#10B981;
+    animation:pulse 1s infinite;
+  }
+  @keyframes pulse{
+    0%{transform:translate(-50%,-50%) scale(1);}
+    50%{transform:translate(-50%,-50%) scale(1.3);}
+    100%{transform:translate(-50%,-50%) scale(1);}
+  }
+
+  /* Connection line SVG layer */
+  .conn-layer{
+    position:absolute;inset:0;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  /* Toolbar row (font, size, etc.) */
+  .dio-toolbar{
+    background:#fafafa;
+    border-bottom:1px solid var(--dio-border);
+    padding:6px 12px;
+    display:flex;align-items:center;gap:8px;
+    font-size:12px;color:#444;
+    flex-wrap:wrap;
+    min-height:34px;
+  }
+  .dio-toolbar .tool{
+    padding:4px 8px;border-radius:4px;
+    cursor:pointer;
+    display:flex;align-items:center;gap:4px;
+    transition:all .15s;
+    font-weight:500;
+    border:1px solid transparent;
+    background:transparent;
+    font-family:inherit;
+    font-size:12px;
+    color:#444;
+  }
+  .dio-toolbar .tool:hover{background:var(--dio-hover);}
+  .dio-toolbar .tool.active{
+    background:var(--dio-blue);
+    color:#fff;
+    border-color:var(--dio-blue-dark);
+  }
+  .dio-toolbar .tool svg{width:14px;height:14px;}
+  .dio-toolbar .divider{
+    width:1px;height:20px;background:#ddd;margin:0 4px;
+  }
+  .dio-toolbar select{
+    font-family:inherit;font-size:12px;
+    border:1px solid var(--dio-border);
+    border-radius:4px;
+    padding:3px 6px;
+    background:#fff;
+    cursor:pointer;
+  }
+
+  /* Status bar */
+  .dio-status{
+    background:#fafafa;
+    border-top:1px solid var(--dio-border);
+    padding:4px 12px;
+    font-size:11px;color:#666;
+    display:flex;align-items:center;gap:12px;
+  }
+  .dio-status .hint{
+    margin-right:auto;
+    color:var(--dio-blue);
+    font-weight:600;
+  }
+
+  /* Progress and check controls */
+  .sim-actions{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0d1828,#1a2942);
+    border-top:1px solid rgba(107,122,153,0.3);
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  }
+  .progress-row{
+    display:flex;align-items:center;gap:10px;flex:1;min-width:200px;
+  }
+  .progress-text{
+    font-size:.82rem;color:#22D3EE;font-weight:800;
+    letter-spacing:.3px;white-space:nowrap;
+  }
+  .progress-bar{
+    flex:1;max-width:340px;height:8px;border-radius:20px;
+    background:rgba(11,18,32,0.7);
+    overflow:hidden;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#22D3EE,#A855F7,#F472B6);
+    width:0%;transition:width .5s ease;
+    border-radius:20px;
+    box-shadow:0 0 12px rgba(34,211,238,0.6);
+  }
+
+  .btn{
+    font-family:inherit;font-size:.85rem;font-weight:800;
+    border:none;border-radius:10px;
+    padding:9px 18px;cursor:pointer;
+    transition:all .22s;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn svg{width:15px;height:15px;}
+  .btn-cyan{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:0 5px 16px rgba(34,211,238,0.4);
+  }
+  .btn-cyan:hover{box-shadow:0 8px 22px rgba(34,211,238,0.6);transform:translateY(-2px);}
+  .btn-purple{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 5px 16px rgba(168,85,247,0.4);
+  }
+  .btn-purple:hover{box-shadow:0 8px 22px rgba(168,85,247,0.6);transform:translateY(-2px);}
+  .btn-metal{
+    background:linear-gradient(135deg,#2a3752,#1a2235);
+    color:#E2E8F0;
+    border:1px solid rgba(199,208,224,0.3);
+  }
+  .btn-metal:hover{border-color:#22D3EE;box-shadow:0 0 18px rgba(34,211,238,0.3);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important;}
+
+  .act-feedback{
+    margin:14px 18px 18px;
+    padding:14px 18px;border-radius:12px;
+    font-size:.9rem;font-weight:700;display:none;
+    border-right:5px solid #10B981;
+    background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.08));
+    color:#6EE7B7;
+    box-shadow:0 4px 14px rgba(16,185,129,0.15);
+  }
+  .act-feedback.show{display:block;animation:fadeUp .3s;}
+  .act-feedback.err{
+    border-color:#EF4444;
+    background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.08));
+    color:#FCA5A5;
+  }
+  .act-feedback.info{
+    border-color:#22D3EE;
+    background:linear-gradient(135deg,rgba(34,211,238,0.15),rgba(34,211,238,0.08));
+    color:#67E8F9;
+  }
+
+  /* Tooltip overlay for UI exploration */
+  .ui-tooltip{
+    position:fixed;
+    background:var(--dio-tooltip);
+    color:#fff;
+    padding:6px 12px;
+    border-radius:6px;
+    font-size:.78rem;
+    font-weight:600;
+    pointer-events:none;
+    z-index:1000;
+    opacity:0;
+    transition:opacity .2s;
+    max-width:250px;
+    line-height:1.5;
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  }
+  .ui-tooltip.show{opacity:1;}
+
+  /* ============ TIPS PANEL ============ */
+  .tips-grid{
+    display:grid;gap:14px;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    margin-bottom:16px;
+  }
+  .tip-card{
+    padding:18px 20px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:16px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    border-right:4px solid var(--neon-cyan);
+  }
+  .tip-card h3{
+    font-size:1rem;font-weight:900;color:#fff;
+    margin-bottom:10px;display:flex;align-items:center;gap:8px;
+  }
+  .tip-card h3 svg{width:18px;height:18px;color:#22D3EE;filter:drop-shadow(0 0 5px rgba(34,211,238,0.6));}
+  .tip-card p{font-size:.9rem;color:var(--text);margin-bottom:8px;}
+  .tip-card ul{list-style:none;padding:0;}
+  .tip-card ul li{
+    padding-right:22px;position:relative;margin-bottom:6px;
+    font-size:.88rem;color:var(--text-light);
+  }
+  .tip-card ul li::before{
+    content:'▸';position:absolute;right:4px;
+    color:#22D3EE;font-weight:900;
+  }
+  .shortcut{
+    display:inline-block;
+    background:#0d1828;
+    color:#22D3EE;
+    font-family:monospace;
+    font-size:.78rem;
+    padding:2px 8px;
+    border-radius:6px;
+    border:1px solid rgba(34,211,238,0.4);
+    margin:0 3px;
+    font-weight:700;
+  }
+
+  /* Footer */
+  .footer{
+    text-align:center;font-size:.85rem;color:var(--text-dim);
+    padding:26px 20px 30px;margin-top:10px;
+  }
+  .footer span{color:#22D3EE;font-weight:800;text-shadow:0 0 8px rgba(34,211,238,0.5);}
+
+  @media (max-width:760px){
+    .lesson-head h1{font-size:1.15rem;}
+    .tab-btn{min-width:auto;font-size:.76rem;padding:9px 8px;}
+    .tab-btn svg{width:14px;height:14px;}
+    .btn{padding:8px 14px;font-size:.8rem;}
+    .dio-topbar{padding:4px 8px;gap:8px;font-size:11px;}
+    .dio-toolbar{padding:4px 8px;gap:4px;font-size:11px;}
+    .dio-shapes{padding:6px;}
+    .shape-group{grid-template-columns:repeat(6,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">
+      <span class="icon-badge"><i data-lucide="monitor"></i></span>
+      <span>تطبيق ديجارام draw.io</span>
+      <span class="chip">المحطة 4</span>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="nav-btn"><i data-lucide="home"></i> الرئيسية</a>
+      <a href="04.html" class="nav-btn"><i data-lucide="arrow-right"></i> السابق</a>
+      <a href="06.html" class="nav-btn"><i data-lucide="arrow-left"></i> التالي</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="lesson-head metal-card">
+    <h1><i data-lucide="monitor"></i> تطبيق ديجارام لتصميم مخطط سير العمل <span class="badge">ورشة عملية</span></h1>
+    <p>يحتوي تطبيق ديجارام draw.io diagram على واجهة رسومية (GUI). تطبيق draw.io مجاني ومفتوح المصدر، ويمكنك استخدامه لرسم النماذج الأولية الخاصة بالمُخَطَّطات باستخدام الأدوات المدمجة، ويحتوي على مجموعة من الأشكال تُمكنك من إنشاء جميع أنواع المُخَطَّطات تقريبًا.</p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-panel="about" role="tab"><i data-lucide="info"></i> عن التطبيق</button>
+    <button class="tab-btn" data-panel="sim" role="tab"><i data-lucide="play-circle"></i> جرّب الواجهة</button>
+    <button class="tab-btn" data-panel="tips" role="tab"><i data-lucide="lightbulb"></i> نصائح</button>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="panel active" id="panel-about">
+    <div class="about-card">
+      <h2><i data-lucide="info"></i> ما هو draw.io؟</h2>
+      <p>تطبيق ديجارام draw.io هو تطبيق مجاني ومفتوح المصدر، يحتوي على واجهة رسومية (Graphical User Interface - GUI)، ويتيح لك رسم النماذج الأولية الخاصة بالمخططات باستخدام أدوات مدمجة، مع مجموعة ضخمة من الأشكال تُمكنك من إنشاء جميع أنواع المُخَطَّطات تقريبًا.</p>
+
+      <h2 style="margin-top:16px"><i data-lucide="layers"></i> واجهة التطبيق الثلاثية</h2>
+      <ul>
+        <li><strong style="color:#22D3EE">لوحة الرسم (Canvas):</strong> المساحة البيضاء الكبيرة التي تُبنى فيها المخططات.</li>
+        <li><strong style="color:#A855F7">محرر الخط (Toolbar):</strong> الشريط العلوي الذي يضم أدوات التنسيق والتحكم.</li>
+        <li><strong style="color:#F472B6">لوحة الأشكال (Shapes Panel):</strong> اللوحة الجانبية التي تحتوي على جميع الأشكال القابلة للسحب.</li>
+      </ul>
+
+      <h2 style="margin-top:16px"><i data-lucide="sparkles"></i> ما الذي ستتعلمه هنا؟</h2>
+      <ul>
+        <li>إنشاء مخطط جديد من الصفر (Blank diagram).</li>
+        <li>إضافة أشكال (مستطيل، معين، بيضاوي...).</li>
+        <li>تعديل النص والخط (Tahoma، غامق، 24 نقطة).</li>
+        <li>ربط الأشكال بموصلات الاتجاه.</li>
+        <li>حفظ المخطط وتصديره PDF.</li>
+      </ul>
+
+      <h2 style="margin-top:16px"><i data-lucide="link"></i> روابط مهمة</h2>
+      <div class="links-row">
+        <a href="https://app.diagrams.net/" target="_blank" rel="noopener" class="link-card">
+          <span class="lc-icon" style="background:linear-gradient(135deg,#22D3EE,#38BDF8);"><i data-lucide="globe"></i></span>
+          <span class="lc-text">
+            <h4>النسخة السحابية</h4>
+            <p>افتح draw.io مباشرة من المتصفح دون تثبيت.</p>
+          </span>
+          <span class="lc-arrow"><i data-lucide="external-link"></i></span>
+        </a>
+        <a href="https://github.com/jgraph/drawio-desktop/releases/tag/v21.2.8" target="_blank" rel="noopener" class="link-card">
+          <span class="lc-icon" style="background:linear-gradient(135deg,#A855F7,#F472B6);"><i data-lucide="download"></i></span>
+          <span class="lc-text">
+            <h4>النسخة المكتبية</h4>
+            <p>حمّل التطبيق لسطح المكتب واستخدمه دون إنترنت.</p>
+          </span>
+          <span class="lc-arrow"><i data-lucide="external-link"></i></span>
+        </a>
+      </div>
+
+      <div style="margin-top:16px;padding:14px 18px;background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(249,115,22,0.08));border-right:4px solid #FBBF24;border-radius:12px;font-size:.9rem;">
+        <strong style="color:#FBBF24;">💡 معلومة:</strong> ديجارام دوت نت (Diagrams.net) هي الأداة السحابية، بينما draw.io diagram هو التطبيق المكتبي. كلاهما يعمل بنفس الطريقة والمشروع نفسه.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIM ============ -->
+  <section class="panel" id="panel-sim">
+    <div class="sim-wrap">
+
+      <!-- Tasks bar -->
+      <div class="tasks-bar">
+        <h3><i data-lucide="target"></i> مهامك</h3>
+        <div class="task-chips" id="taskChips">
+          <div class="task-chip active" data-task="1"><span class="num">1</span> مستطيل مستدير</div>
+          <div class="task-chip" data-task="2"><span class="num">2</span> كتابة نص</div>
+          <div class="task-chip" data-task="3"><span class="num">3</span> معين</div>
+          <div class="task-chip" data-task="4"><span class="num">4</span> موصل اتجاه</div>
+          <div class="task-chip" data-task="5"><span class="num">5</span> تصدير PDF</div>
+        </div>
+      </div>
+
+      <!-- Mission banner -->
+      <div class="mission-banner" id="missionBanner">
+        <i data-lucide="mouse-pointer-click"></i>
+        <span id="missionText">المهمة 1: <strong>اسحب مستطيلًا مستدير الزوايا</strong> من لوحة الأشكال إلى لوحة الرسم.</span>
+      </div>
+
+      <!-- draw.io mockup -->
+      <div class="dio" id="dioMock">
+        <!-- top menu bar -->
+        <div class="dio-topbar">
+          <span class="menu-item" data-tip="فتح ملف جديد أو موجود">ملف</span>
+          <span class="menu-item" data-tip="تعديل، تراجع، إعادة">تعديل</span>
+          <span class="menu-item" data-tip="تكبير، تصغير، ملاءمة">عرض</span>
+          <span class="menu-item" data-tip="ترتيب العناصر فوق بعضها">ترتيب</span>
+          <span class="menu-item" data-tip="إدراج عناصر إضافية">إدراج</span>
+          <span class="file-name">مخطط دون اسم.drawio</span>
+        </div>
+
+        <!-- toolbar -->
+        <div class="dio-toolbar" data-tip="محرر الخط — أدوات تنسيق النص">
+          <select id="fontSelect" class="font-select" title="نوع الخط">
+            <option value="Helvetica">Helvetica</option>
+            <option value="Tahoma" selected>Tahoma</option>
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+          <select id="sizeSelect" class="size-select" title="حجم الخط">
+            <option value="12">12 pt</option>
+            <option value="16">16 pt</option>
+            <option value="24" selected>24 pt</option>
+            <option value="32">32 pt</option>
+          </select>
+          <button class="tool" id="boldBtn" title="غامق (Bold)"><strong>B</strong></button>
+          <div class="divider"></div>
+          <button class="tool" id="connectorToolBtn" title="موصل اتجاه"><i data-lucide="arrow-left-right"></i> <span>موصل</span></button>
+          <div class="divider"></div>
+          <button class="tool" id="exportBtn" title="تصدير PDF"><i data-lucide="file-down"></i> <span>تصدير PDF</span></button>
+          <div class="divider"></div>
+          <button class="tool" id="clearAllBtn" title="مسح الكل"><i data-lucide="trash-2"></i></button>
+        </div>
+
+        <!-- body: shapes + canvas -->
+        <div class="dio-body">
+          <aside class="dio-shapes" data-tip="لوحة الأشكال — اسحب أي شكل إلى لوحة الرسم">
+            <h4>عام</h4>
+            <div class="shape-group" id="shapeGroup">
+              <!-- shapes injected by JS -->
+            </div>
+            <h4>مخططات</h4>
+            <div class="shape-group">
+              <div class="dio-shape" data-shape="rect" data-tip="مستطيل">
+                <svg viewBox="0 0 40 30"><rect x="2" y="6" width="36" height="18" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dio-shape" data-shape="diamond" data-tip="معين — للقرار">
+                <svg viewBox="0 0 40 30"><polygon points="20,4 38,15 20,26 2,15" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dio-shape" data-shape="oval" data-tip="بيضاوي — بداية/نهاية">
+                <svg viewBox="0 0 40 30"><ellipse cx="20" cy="15" rx="17" ry="10" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dio-shape" data-shape="parallelogram" data-tip="متوازي الأضلاع">
+                <svg viewBox="0 0 40 30"><polygon points="8,6 38,6 32,24 2,24" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dio-shape" data-shape="doc" data-tip="مستند">
+                <svg viewBox="0 0 40 30"><path d="M4,5 L36,5 L36,22 Q30,26 24,22 Q18,18 12,22 Q8,25 4,22 Z" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dio-shape" data-shape="arrow" data-tip="سهم اتجاه">
+                <svg viewBox="0 0 40 30"><path d="M4,15 L32,15 M24,7 L32,15 L24,23" fill="none" stroke="#333" stroke-width="1.8"/></svg>
+              </div>
+            </div>
+          </aside>
+
+          <div class="dio-canvas-wrap">
+            <div class="dio-canvas" id="dioCanvas" data-tip="لوحة الرسم — أفلت الأشكال هنا">
+              <div class="empty-hint">
+                <i data-lucide="mouse-pointer-2"></i>
+                <span>اسحب شكلًا من لوحة الأشكال</span>
+              </div>
+            </div>
+            <svg class="conn-layer" id="connLayer"></svg>
+          </div>
+        </div>
+
+        <!-- status bar -->
+        <div class="dio-status">
+          <span id="statusText">جاهز</span>
+          <span class="hint" id="statusHint">الخط: Tahoma • الحجم: 24pt</span>
+        </div>
+      </div>
+
+      <!-- actions bar -->
+      <div class="sim-actions">
+        <div class="progress-row">
+          <span class="progress-text" id="taskProgress">المهمة 1 من 5</span>
+          <div class="progress-bar"><div class="progress-fill" id="taskProgressFill"></div></div>
+        </div>
+        <button class="btn btn-metal" id="prevTaskBtn"><i data-lucide="arrow-right"></i> السابق</button>
+        <button class="btn btn-cyan" id="nextTaskBtn">التالي <i data-lucide="arrow-left"></i></button>
+        <button class="btn btn-purple" id="resetSimBtn"><i data-lucide="rotate-ccw"></i> إعادة</button>
+      </div>
+
+      <div class="act-feedback" id="simFb"></div>
+    </div>
+  </section>
+
+  <!-- ============ TIPS ============ -->
+  <section class="panel" id="panel-tips">
+    <div class="tips-grid">
+      <div class="tip-card">
+        <h3><i data-lucide="keyboard"></i> اختصارات مهمة</h3>
+        <ul>
+          <li>حفظ المخطط: <span class="shortcut">Ctrl + S</span></li>
+          <li>نسخ: <span class="shortcut">Ctrl + C</span></li>
+          <li>لصق: <span class="shortcut">Ctrl + V</span></li>
+          <li>تراجع: <span class="shortcut">Ctrl + Z</span></li>
+          <li>حذف: <span class="shortcut">Delete</span></li>
+          <li>تحديد الكل: <span class="shortcut">Ctrl + A</span></li>
+        </ul>
+      </div>
+
+      <div class="tip-card">
+        <h3><i data-lucide="spline"></i> أنواع الموصلات</h3>
+        <ul>
+          <li><strong>موصل الاتجاه (Directional):</strong> سهم باتجاه واحد من شكل إلى آخر.</li>
+          <li><strong>السهم ثنائي الاتجاه (Bidirectional):</strong> سهم في كلا الطرفين.</li>
+          <li><strong>الخطّ المنقّط (Dotted):</strong> لعلاقة غير مباشرة أو اختيارية.</li>
+          <li><strong>الخط المتصل:</strong> العلاقة الافتراضية.</li>
+        </ul>
+      </div>
+
+      <div class="tip-card">
+        <h3><i data-lucide="save"></i> الحفظ والتصدير</h3>
+        <ul>
+          <li><strong>الحفظ:</strong> <span class="shortcut">Ctrl+S</span> → Save As → اسم الملف → Save.</li>
+          <li><strong>تصدير PDF:</strong> File → Export As → PDF.</li>
+          <li>حدّد «<strong>Include a copy of my diagram</strong>» لتضمين نسخة المخطط.</li>
+          <li>اختر «Documents» ثم «Save».</li>
+        </ul>
+      </div>
+
+      <div class="tip-card">
+        <h3><i data-lucide="palette"></i> تنسيق النص</h3>
+        <ul>
+          <li>الخط الافتراضي: <strong>Helvetica</strong>.</li>
+          <li>يُفضّل تغييره إلى <strong>Tahoma</strong> لدعم العربية.</li>
+          <li>الحجم الافتراضي: <strong>12pt</strong>.</li>
+          <li>يُرفع إلى <strong>24pt</strong> للعناوين والقراءة المريحة.</li>
+          <li>فعّل <strong>Bold (غامق)</strong> للنصوص المهمة.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="about-card">
+      <h2><i data-lucide="workflow"></i> خطوات سير العمل داخل draw.io</h2>
+      <ul>
+        <li><strong>1.</strong> افتح التطبيق واضغط «إنشاء رسم جديد».</li>
+        <li><strong>2.</strong> حدّد «مُخَطَّط فارغ (Blank diagram)» ثم «إنشاء».</li>
+        <li><strong>3.</strong> اسحب الأشكال من لوحة الأشكال إلى لوحة الرسم.</li>
+        <li><strong>4.</strong> انقر نقرًا مزدوجًا على أي شكل لتحرير النص.</li>
+        <li><strong>5.</strong> استخدم محرر الخط لتغيير الخط والحجم والتنسيق.</li>
+        <li><strong>6.</strong> صِل الأشكال بموصلات الاتجاه.</li>
+        <li><strong>7.</strong> احفظ المخطط (Ctrl+S) أو صدّره PDF.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">فكرة وتصميم <span>محمد مجممي</span></footer>
+
+<!-- Tooltip overlay -->
+<div class="ui-tooltip" id="uiTooltip"></div>
+
+<script>
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    if(window.lucide) lucide.createIcons();
+  });
+});
+
+/* ============ TOOLTIP ============ */
+const tooltip = document.getElementById('uiTooltip');
+let tooltipTimer = null;
+
+document.querySelectorAll('[data-tip]').forEach(el=>{
+  el.addEventListener('mouseenter',(e)=>{
+    clearTimeout(tooltipTimer);
+    tooltipTimer = setTimeout(()=>{
+      tooltip.textContent = el.dataset.tip;
+      const rect = el.getBoundingClientRect();
+      tooltip.style.right = 'auto';
+      tooltip.style.left = Math.min(window.innerWidth - 260, rect.left) + 'px';
+      tooltip.style.top = (rect.bottom + 6) + 'px';
+      tooltip.classList.add('show');
+    }, 350);
+  });
+  el.addEventListener('mouseleave',()=>{
+    clearTimeout(tooltipTimer);
+    tooltip.classList.remove('show');
+  });
+});
+
+/* ============ SHAPES PALETTE (general group) ============ */
+const shapeDefs = [
+  {id:'rounded', name:'مستطيل مستدير', svg:`<svg viewBox="0 0 40 30"><rect x="2" y="6" width="36" height="18" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'rect', name:'مستطيل', svg:`<svg viewBox="0 0 40 30"><rect x="2" y="6" width="36" height="18" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'diamond', name:'معين', svg:`<svg viewBox="0 0 40 30"><polygon points="20,4 38,15 20,26 2,15" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'oval', name:'بيضاوي', svg:`<svg viewBox="0 0 40 30"><ellipse cx="20" cy="15" rx="17" ry="10" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'parallelogram', name:'متوازي', svg:`<svg viewBox="0 0 40 30"><polygon points="8,6 38,6 32,24 2,24" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'doc', name:'مستند', svg:`<svg viewBox="0 0 40 30"><path d="M4,5 L36,5 L36,22 Q30,26 24,22 Q18,18 12,22 Q8,25 4,22 Z" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'arrow', name:'سهم', svg:`<svg viewBox="0 0 40 30"><path d="M4,15 L32,15 M24,7 L32,15 L24,23" fill="none" stroke="#333" stroke-width="1.8"/></svg>`},
+  {id:'circle', name:'دائرة', svg:`<svg viewBox="0 0 40 30"><circle cx="20" cy="15" r="10" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'note', name:'ملاحظة', svg:`<svg viewBox="0 0 40 30"><path d="M4,5 L30,5 L36,11 L36,25 L4,25 Z" fill="#fff" stroke="#333" stroke-width="1.5"/><path d="M30,5 L30,11 L36,11" fill="none" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'cylinder', name:'أسطوانة', svg:`<svg viewBox="0 0 40 30"><ellipse cx="20" cy="8" rx="14" ry="4" fill="#fff" stroke="#333" stroke-width="1.5"/><path d="M6,8 L6,22 M34,8 L34,22" fill="none" stroke="#333" stroke-width="1.5"/><ellipse cx="20" cy="22" rx="14" ry="4" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`},
+  {id:'text', name:'نص', svg:`<svg viewBox="0 0 40 30"><text x="20" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">T</text></svg>`},
+  {id:'table', name:'جدول', svg:`<svg viewBox="0 0 40 30"><rect x="4" y="7" width="32" height="16" fill="#fff" stroke="#333" stroke-width="1.5"/><line x1="4" y1="12" x2="36" y2="12" stroke="#333" stroke-width="1"/><line x1="4" y1="18" x2="36" y2="18" stroke="#333" stroke-width="1"/><line x1="14" y1="7" x2="14" y2="23" stroke="#333" stroke-width="1"/><line x1="26" y1="7" x2="26" y2="23" stroke="#333" stroke-width="1"/></svg>`}
+];
+
+const shapeGroup = document.getElementById('shapeGroup');
+shapeDefs.forEach(sd=>{
+  const el = document.createElement('div');
+  el.className = 'dio-shape';
+  el.dataset.shape = sd.id;
+  el.dataset.tip = sd.name;
+  el.draggable = true;
+  el.innerHTML = sd.svg;
+  el.addEventListener('dragstart',(e)=>{
+    e.dataTransfer.setData('text/plain','shape:'+sd.id);
+    e.dataTransfer.effectAllowed = 'copy';
+    el.classList.add('dragging');
+  });
+  el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+  // tooltip
+  el.addEventListener('mouseenter',(e)=>{
+    clearTimeout(tooltipTimer);
+    tooltipTimer = setTimeout(()=>{
+      tooltip.textContent = sd.name;
+      const rect = el.getBoundingClientRect();
+      tooltip.style.left = (rect.left - 40) + 'px';
+      tooltip.style.top = (rect.bottom + 6) + 'px';
+      tooltip.classList.add('show');
+    }, 350);
+  });
+  el.addEventListener('mouseleave',()=>{
+    clearTimeout(tooltipTimer);
+    tooltip.classList.remove('show');
+  });
+  shapeGroup.appendChild(el);
+});
+
+/* ============ CANVAS STATE ============ */
+const dioCanvas = document.getElementById('dioCanvas');
+const connLayer = document.getElementById('connLayer');
+let placedEls = [];
+let elCounter = 0;
+let connectorMode = false;
+let connectorSource = null;
+let connCount = 0;
+let currentFont = 'Tahoma';
+let currentSize = '24';
+let currentBold = true;
+
+/* ============ TASKS STATE ============ */
+const TOTAL_TASKS = 5;
+let currentTask = 1;
+let tasksDone = {
+  1:false, 2:false, 3:false, 4:false, 5:false
+};
+let hasRoundedRect = false;
+let hasTextEdit = false;
+let hasDiamond = false;
+let hasConnection = false;
+let hasExported = false;
+
+/* ============ DRAG & DROP ONTO CANVAS ============ */
+dioCanvas.addEventListener('dragover',(e)=>{
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  dioCanvas.classList.add('drag-over');
+});
+dioCanvas.addEventListener('dragleave',()=>{
+  dioCanvas.classList.remove('drag-over');
+});
+dioCanvas.addEventListener('drop',(e)=>{
+  e.preventDefault();
+  dioCanvas.classList.remove('drag-over');
+  const data = e.dataTransfer.getData('text/plain');
+  if(!data.startsWith('shape:')) return;
+  const shapeId = data.substring(6);
+
+  const rect = dioCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  addShapeToCanvas(shapeId, x, y);
+});
+
+function getShapeDef(id){
+  return shapeDefs.find(s=>s.id === id) || shapeDefs[0];
+}
+
+function getShapeSize(id){
+  if(id === 'diamond') return {w:120, h:90};
+  if(id === 'oval') return {w:130, h:70};
+  if(id === 'circle') return {w:90, h:90};
+  if(id === 'text') return {w:100, h:40};
+  if(id === 'arrow') return {w:120, h:50};
+  if(id === 'note') return {w:120, h:80};
+  if(id === 'cylinder') return {w:100, h:80};
+  if(id === 'table') return {w:140, h:80};
+  return {w:140, h:70};
+}
+
+function addShapeToCanvas(shapeId, x, y){
+  const def = getShapeDef(shapeId);
+  const size = getShapeSize(shapeId);
+  const id = 'el-' + (++elCounter);
+
+  const el = document.createElement('div');
+  el.className = 'dio-el';
+  el.id = id;
+  el.dataset.shape = shapeId;
+  el.style.left = Math.max(0, x - size.w/2) + 'px';
+  el.style.top = Math.max(0, y - size.h/2) + 'px';
+  el.style.width = size.w + 'px';
+  el.style.height = size.h + 'px';
+
+  el.innerHTML = `
+    ${def.svg}
+    <span class="el-text"></span>
+    <button class="del-btn" title="حذف">×</button>
+    <span class="connector-dot"></span>
+  `;
+
+  // dynamic text style
+  const textEl = el.querySelector('.el-text');
+  applyTextStyle(textEl);
+
+  // drag within canvas
+  let dragging = false, offX = 0, offY = 0;
+
+  el.addEventListener('pointerdown',(e)=>{
+    if(e.target.classList.contains('del-btn')) return;
+    if(e.target.classList.contains('connector-dot')){
+      startConnector(el, e);
+      return;
+    }
+    if(e.target.classList.contains('el-text') && e.target.getAttribute('contenteditable') === 'true') return;
+    if(connectorMode){
+      // selecting target
+      if(connectorSource && connectorSource !== el){
+        finishConnector(el);
+        return;
+      }
+    }
+    dragging = true;
+    const r = el.getBoundingClientRect();
+    offX = e.clientX - r.left;
+    offY = e.clientY - r.top;
+    el.setPointerCapture(e.pointerId);
+    el.style.zIndex = 30;
+    // select
+    document.querySelectorAll('.dio-el').forEach(x=>x.classList.remove('selected'));
+    el.classList.add('selected');
+  });
+  el.addEventListener('pointermove',(e)=>{
+    if(!dragging) return;
+    const rect = dioCanvas.getBoundingClientRect();
+    let nx = e.clientX - rect.left - offX;
+    let ny = e.clientY - rect.top - offY;
+    nx = Math.max(0, Math.min(rect.width - size.w, nx));
+    ny = Math.max(0, Math.min(rect.height - size.h, ny));
+    el.style.left = nx + 'px';
+    el.style.top = ny + 'px';
+    redrawConnections();
+  });
+  el.addEventListener('pointerup',()=>{
+    dragging = false;
+    el.style.zIndex = 5;
+  });
+
+  // double-click text editing
+  el.addEventListener('dblclick',(e)=>{
+    e.stopPropagation();
+    textEl.setAttribute('contenteditable','true');
+    textEl.focus();
+    // select all
+    const range = document.createRange();
+    range.selectNodeContents(textEl);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    hasTextEdit = true;
+    checkTask2();
+  });
+  textEl.addEventListener('blur',()=>{
+    textEl.setAttribute('contenteditable','false');
+    applyTextStyle(textEl);
+  });
+  textEl.addEventListener('input',()=>{
+    // live font application
+    applyTextStyle(textEl);
+  });
+
+  // delete button
+  el.querySelector('.del-btn').addEventListener('click',(e)=>{
+    e.stopPropagation();
+    // remove connections related to this el
+    el.connectionsOut?.forEach(c=>c.remove());
+    el.connectionsIn?.forEach(c=>c.remove());
+    el.remove();
+    placedEls = placedEls.filter(p=>p !== el);
+    redrawConnections();
+    if(placedEls.length === 0) dioCanvas.classList.remove('has-shapes');
+  });
+
+  dioCanvas.appendChild(el);
+  dioCanvas.classList.add('has-shapes');
+  placedEls.push(el);
+  el.connectionsOut = [];
+  el.connectionsIn = [];
+
+  // Track tasks
+  if(shapeId === 'rounded') { hasRoundedRect = true; checkTask1(); }
+  if(shapeId === 'diamond') { hasDiamond = true; checkTask3(); }
+
+  setStatus(`أضفت ${def.name}`);
+}
+
+function applyTextStyle(textEl){
+  textEl.style.fontFamily = currentFont + ',Tajawal,sans-serif';
+  textEl.style.fontSize = (parseInt(currentSize) * 0.55) + 'px';
+  textEl.style.fontWeight = currentBold ? '700' : '400';
+}
+
+/* ============ CONNECTORS ============ */
+function startConnector(el, e){
+  e.stopPropagation();
+  connectorMode = true;
+  connectorSource = el;
+  el.classList.add('connector-mode');
+  document.querySelectorAll('.dio-el').forEach(other=>{
+    if(other !== el) other.classList.add('connector-target');
+  });
+  setStatus('اختر الشكل الهدف لإتمام الاتصال');
+}
+
+function finishConnector(targetEl){
+  if(!connectorSource || !targetEl) return;
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('stroke','#1d8cf8');
+  line.setAttribute('stroke-width','2');
+  line.setAttribute('marker-end','url(#arrowHead)');
+  connLayer.appendChild(line);
+
+  const conn = {line, from: connectorSource, to: targetEl};
+  connectorSource.connectionsOut.push(conn);
+  targetEl.connectionsIn.push(conn);
+  hasConnection = true;
+  connCount++;
+  redrawConnections();
+  checkTask4();
+
+  // reset
+  document.querySelectorAll('.dio-el').forEach(x=>{
+    x.classList.remove('connector-mode','connector-target');
+  });
+  connectorMode = false;
+  connectorSource = null;
+  setStatus('تم إنشاء موصل الاتجاه ✓');
+}
+
+function redrawConnections(){
+  placedEls.forEach(el=>{
+    el.connectionsOut?.forEach(conn=>{
+      const canvasRect = dioCanvas.getBoundingClientRect();
+      const fromRect = conn.from.getBoundingClientRect();
+      const toRect = conn.to.getBoundingClientRect();
+      const x1 = fromRect.left - canvasRect.left + fromRect.width/2;
+      const y1 = fromRect.top - canvasRect.top + fromRect.height/2;
+      const x2 = toRect.left - canvasRect.left + toRect.width/2;
+      const y2 = toRect.top - canvasRect.top + toRect.height/2;
+      conn.line.setAttribute('x1',x1);
+      conn.line.setAttribute('y1',y1);
+      conn.line.setAttribute('x2',x2);
+      conn.line.setAttribute('y2',y2);
+    });
+  });
+}
+
+// add arrow marker defs to connLayer
+(function addMarker(){
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  defs.innerHTML = `
+    <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1d8cf8"/>
+    </marker>
+  `;
+  connLayer.appendChild(defs);
+})();
+
+/* ============ TOOLBAR ACTIONS ============ */
+document.getElementById('fontSelect').addEventListener('change',(e)=>{
+  currentFont = e.target.value;
+  applyStyleToAll();
+  setStatus(`تم تغيير الخط إلى ${currentFont}`);
+  updateHint();
+});
+document.getElementById('sizeSelect').addEventListener('change',(e)=>{
+  currentSize = e.target.value;
+  applyStyleToAll();
+  setStatus(`تم تغيير الحجم إلى ${currentSize}pt`);
+  updateHint();
+});
+document.getElementById('boldBtn').addEventListener('click',()=>{
+  currentBold = !currentBold;
+  document.getElementById('boldBtn').classList.toggle('active',currentBold);
+  applyStyleToAll();
+  setStatus(currentBold ? 'تم تفعيل الخط الغامق' : 'تم إلغاء الخط الغامق');
+});
+document.getElementById('connectorToolBtn').addEventListener('click',()=>{
+  const btn = document.getElementById('connectorToolBtn');
+  connectorMode = !connectorMode;
+  btn.classList.toggle('active', connectorMode);
+  if(connectorMode){
+    setStatus('انقر على نقطة في الشكل الأول، ثم انقر على الشكل الثاني');
+    document.querySelectorAll('.dio-el').forEach(x=>x.classList.add('connector-mode'));
+  } else {
+    document.querySelectorAll('.dio-el').forEach(x=>x.classList.remove('connector-mode','connector-target'));
+    connectorSource = null;
+    setStatus('جاهز');
+  }
+});
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  hasExported = true;
+  checkTask5();
+  setStatus('محاكاة: تم تصدير المخطط بصيغة PDF');
+});
+
+document.getElementById('clearAllBtn').addEventListener('click',()=>{
+  if(!confirm('مسح جميع الأشكال من لوحة الرسم؟')) return;
+  placedEls.forEach(el=>el.remove());
+  placedEls = [];
+  while(connLayer.firstChild && connLayer.firstChild.tagName !== 'defs'){
+    connLayer.removeChild(connLayer.firstChild);
+  }
+  dioCanvas.classList.remove('has-shapes');
+  setStatus('تم مسح لوحة الرسم');
+});
+
+function applyStyleToAll(){
+  placedEls.forEach(el=>{
+    const t = el.querySelector('.el-text');
+    if(t) applyTextStyle(t);
+  });
+}
+
+function updateHint(){
+  document.getElementById('statusHint').textContent = `الخط: ${currentFont} • الحجم: ${currentSize}pt`;
+}
+
+function setStatus(msg){
+  document.getElementById('statusText').textContent = msg;
+}
+
+/* ============ TASK SYSTEM ============ */
+const TASKS = {
+  1:{
+    text:'المهمة 1: <strong>اسحب مستطيلًا مستدير الزوايا</strong> من لوحة الأشكال إلى لوحة الرسم.',
+    check:()=>hasRoundedRect,
+    done:'✓ أحسنت! أضفت مستطيلًا مستدير الزوايا. هذا هو الشكل الأساسي للعمليات.',
+    fail:'اسحب «مستطيل مستدير» (Rounded Rectangle) من لوحة الأشكال إلى لوحة الرسم.'
+  },
+  2:{
+    text:'المهمة 2: <strong>انقر نقرًا مزدوجًا على الشكل</strong> واكتب نصًّا داخله (مثل: «عملية»)، ثم غيّر الخط إلى Tahoma من محرر الخط.',
+    check:()=>hasTextEdit && placedEls.some(el=>el.querySelector('.el-text')?.textContent.trim().length > 0),
+    done:'✓ رائع! حرّرت النص وطبّقت التنسيق. لاحظ أن الخط الافتراضي هو Helvetica، ونحن نستخدم Tahoma لدعم العربية.',
+    fail:'انقر نقرًا مزدوجًا على الشكل، اكتب نصًّا، ثم غيّر الخط من محرر الخط إلى Tahoma.'
+  },
+  3:{
+    text:'المهمة 3: <strong>اسحب معينًا (Diamond)</strong> — يمثل القرار — إلى لوحة الرسم.',
+    check:()=>hasDiamond,
+    done:'✓ ممتاز! المعين يمثل قرارًا يلزم اتخاذه ويؤدي إلى عملية أو قرار آخر.',
+    fail:'اسحب شكل «معين» (Diamond) من لوحة الأشكال إلى لوحة الرسم.'
+  },
+  4:{
+    text:'المهمة 4: <strong>اربط الشكلين بموصل اتجاه</strong>. فعّل «موصل الاتجاه» من محرر الخط، ثم انقر على النقطة الزرقاء في الشكل الأول ونقرة على الشكل الثاني.',
+    check:()=>hasConnection,
+    done:'✓ أحسنت! ربطت الشكلين بموصل اتجاه. هذا يوضح العلاقة بين العمليات واتجاه تدفقها.',
+    fail:'فعّل «موصل الاتجاه» من محرر الخط، ثم اسحب من النقطة الزرقاء في الشكل الأول إلى الشكل الثاني.'
+  },
+  5:{
+    text:'المهمة 5: <strong>صدّر المخطط PDF</strong> — اضغط على زر «تصدير PDF» في محرر الخط. في التطبيق الحقيقي: File → Export As → PDF → Include a copy of my diagram → Export.',
+    check:()=>hasExported,
+    done:'✓ أكملت جميع المهام! أصبحت جاهزًا لاستخدام draw.io بنفسك. في المحطة التالية ستبني مخطط سير عمل صيانة التطبيق كاملًا.',
+    fail:'اضغط على زر «تصدير PDF» في محرر الخط.'
+  }
+};
+
+function checkTask1(){
+  if(currentTask === 1 && hasRoundedRect){
+    markTaskDone(1);
+  }
+}
+function checkTask2(){
+  if(currentTask === 2){
+    // check on next button click
+  }
+}
+function checkTask3(){
+  if(currentTask === 3 && hasDiamond){
+    markTaskDone(3);
+  }
+}
+function checkTask4(){
+  if(currentTask === 4 && hasConnection){
+    markTaskDone(4);
+  }
+}
+function checkTask5(){
+  if(currentTask === 5 && hasExported){
+    markTaskDone(5);
+  }
+}
+
+function markTaskDone(n){
+  tasksDone[n] = true;
+  const chip = document.querySelector(`.task-chip[data-task="${n}"]`);
+  if(chip){
+    chip.classList.remove('active');
+    chip.classList.add('done');
+  }
+  const fb = document.getElementById('simFb');
+  fb.className = 'act-feedback show';
+  fb.innerHTML = TASKS[n].done;
+  setMissionText();
+}
+
+function setMissionText(){
+  // find first incomplete task
+  for(let i=1;i<=TOTAL_TASKS;i++){
+    if(!tasksDone[i]){
+      currentTask = i;
+      document.getElementById('missionText').innerHTML = TASKS[i].text;
+      document.querySelectorAll('.task-chip').forEach(c=>{
+        c.classList.toggle('active', +c.dataset.task === i);
+      });
+      document.getElementById('taskProgress').textContent = `المهمة ${i} من ${TOTAL_TASKS}`;
+      document.getElementById('taskProgressFill').style.width = ((i-1)/TOTAL_TASKS*100) + '%';
+      return;
+    }
+  }
+  // all done
+  currentTask = TOTAL_TASKS + 1;
+  document.getElementById('missionText').innerHTML = '🎉 أكملت جميع المهام! يمكنك الآن استكشاف «نصائح» أو الانتقال إلى المحطة التالية.';
+  document.getElementById('taskProgress').textContent = `مكتمل ${TOTAL_TASKS} من ${TOTAL_TASKS}`;
+  document.getElementById('taskProgressFill').style.width = '100%';
+}
+
+document.getElementById('nextTaskBtn').addEventListener('click',()=>{
+  if(currentTask > TOTAL_TASKS) return;
+  const t = TASKS[currentTask];
+  if(t.check()){
+    markTaskDone(currentTask);
+    setMissionText();
+  } else {
+    const fb = document.getElementById('simFb');
+    fb.className = 'act-feedback err show';
+    fb.innerHTML = '⚠ ' + t.fail;
+  }
+});
+
+document.getElementById('prevTaskBtn').addEventListener('click',()=>{
+  // just show info about previous task (visual)
+  setStatus('راجع المهمة السابقة');
+});
+
+document.getElementById('resetSimBtn').addEventListener('click',()=>{
+  if(!confirm('إعادة المحاكاة من البداية؟')) return;
+  placedEls.forEach(el=>el.remove());
+  placedEls = [];
+  while(connLayer.firstChild && connLayer.firstChild.tagName !== 'defs'){
+    connLayer.removeChild(connLayer.firstChild);
+  }
+  dioCanvas.classList.remove('has-shapes');
+  hasRoundedRect = false; hasTextEdit = false; hasDiamond = false;
+  hasConnection = false; hasExported = false;
+  connCount = 0;
+  tasksDone = {1:false,2:false,3:false,4:false,5:false};
+  document.querySelectorAll('.task-chip').forEach(c=>{
+    c.classList.remove('done','active');
+  });
+  document.querySelector('.task-chip[data-task="1"]').classList.add('active');
+  document.getElementById('simFb').className = 'act-feedback';
+  currentTask = 1;
+  setMissionText();
+  setStatus('جاهز');
+});
+
+/* ============ INIT ============ */
+document.getElementById('boldBtn').classList.add('active');
+setMissionText();
+if(window.lucide) lucide.createIcons();
+setTimeout(()=>{ if(window.lucide) lucide.createIcons(); }, 200);
+</script>
+</body>
+</html>

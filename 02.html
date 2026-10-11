@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أنواع المخططات — إنشاء المخطط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+  :root{
+    --primary:#3B2E7E;
+    --primary-2:#5B4BC4;
+    --accent:#FF6B6B;
+    --accent-2:#FFA94D;
+    --text:#2B2A47;
+    --text-light:#6B6A8A;
+    --card:#ffffff;
+    --border:#E4E2F5;
+    --bg:linear-gradient(135deg,#FFE9F3 0%,#E0F0FF 40%,#E7EBFF 70%,#E3F9E7 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    background:var(--bg);background-attachment:fixed;
+    color:var(--text);line-height:1.7;overflow-x:hidden;
+  }
+
+  /* Topbar */
+  .topbar{
+    background:linear-gradient(135deg,#FF6B6B 0%,#FFA94D 35%,#9775FA 70%,#4DABF7 100%);
+    color:#fff;padding:16px 20px;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 6px 24px rgba(151,117,250,0.35);
+  }
+  .topbar-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+  }
+  .topbar-title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.02rem;}
+  .topbar-title svg{width:22px;height:22px;}
+  .topbar-title .chip{
+    background:rgba(255,255,255,0.22);
+    border:1px solid rgba(255,255,255,0.35);
+    padding:4px 12px;border-radius:20px;
+    font-size:.76rem;font-weight:600;
+  }
+  .nav-buttons{display:flex;gap:8px;flex-wrap:wrap;}
+  .nav-btn{
+    background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.35);
+    color:#fff;text-decoration:none;
+    padding:7px 14px;border-radius:10px;
+    font-size:.85rem;font-weight:700;font-family:inherit;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .2s;cursor:pointer;
+  }
+  .nav-btn:hover{background:rgba(255,255,255,0.32);transform:translateY(-1px);}
+  .nav-btn svg{width:15px;height:15px;}
+
+  .container{max-width:1180px;margin:0 auto;padding:22px 20px 0;}
+
+  .lesson-head{
+    background:var(--card);border-radius:18px;
+    padding:22px 24px;margin-bottom:16px;
+    border:2px solid transparent;
+    background-image:linear-gradient(#fff,#fff),linear-gradient(135deg,#9775FA,#4DABF7,#38D9A9);
+    background-origin:border-box;background-clip:padding-box,border-box;
+    box-shadow:0 8px 30px rgba(151,117,250,0.12);
+  }
+  .lesson-head h1{
+    font-size:1.5rem;font-weight:900;color:var(--primary);
+    display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;
+  }
+  .lesson-head h1 .badge{
+    background:linear-gradient(135deg,#9775FA,#4DABF7);
+    color:#fff;font-size:.72rem;font-weight:800;
+    padding:4px 12px;border-radius:20px;
+  }
+  .lesson-head p{font-size:.98rem;color:var(--text-light);}
+
+  /* Tabs */
+  .tabs{
+    display:flex;gap:6px;background:var(--card);
+    border:2px solid var(--border);border-radius:14px;
+    padding:6px;margin-bottom:16px;
+    box-shadow:0 6px 20px rgba(151,117,250,0.08);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    flex:1;min-width:130px;border:none;background:transparent;
+    font-family:inherit;font-size:.9rem;font-weight:800;
+    color:var(--text-light);padding:11px 14px;border-radius:10px;
+    cursor:pointer;transition:all .25s;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    white-space:nowrap;
+  }
+  .tab-btn svg{width:17px;height:17px;}
+  .tab-btn:hover{background:#F5F2FF;color:var(--primary);}
+  .tab-btn.active{background:linear-gradient(135deg,#9775FA,#4DABF7);color:#fff;box-shadow:0 6px 16px rgba(151,117,250,0.35);}
+  .tab-btn[data-panel="office"].active{background:linear-gradient(135deg,#FF6B6B,#FFA94D);box-shadow:0 6px 16px rgba(255,107,107,0.35);}
+  .tab-btn[data-panel="result"].active{background:linear-gradient(135deg,#DA77F2,#F783AC);box-shadow:0 6px 16px rgba(218,119,242,0.35);}
+
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* Concepts */
+  .concept-card{
+    background:var(--card);border-radius:16px;
+    padding:22px 24px;border:2px solid var(--border);
+    box-shadow:0 6px 20px rgba(151,117,250,0.07);
+    margin-bottom:14px;
+  }
+  .concept-card h2{
+    font-size:1.12rem;font-weight:900;color:var(--primary);
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .concept-card h2 svg{color:var(--primary-2);width:22px;height:22px;}
+  .concept-card h3{
+    font-size:1rem;font-weight:800;color:var(--primary-2);
+    margin:14px 0 8px;display:flex;align-items:center;gap:6px;
+  }
+  .concept-card h3 svg{width:18px;height:18px;}
+  .concept-card p{font-size:.95rem;color:var(--text);margin-bottom:10px;}
+  .def-box{
+    background:linear-gradient(135deg,#FFF4E6,#FFE0F0);
+    border-right:5px solid #FF6B6B;
+    border-radius:12px;padding:14px 18px;margin:12px 0;
+  }
+  .def-box strong{color:#C92A2A;font-weight:900;}
+  .concept-card ul{list-style:none;padding-right:0;}
+  .concept-card ul li{
+    font-size:.93rem;padding-right:26px;position:relative;
+    margin-bottom:7px;
+  }
+  .concept-card ul li::before{
+    content:'◆';position:absolute;right:4px;
+    color:#FFA94D;font-size:.85rem;top:4px;
+  }
+  .type-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 14px;border-radius:20px;
+    font-size:.8rem;font-weight:800;color:#fff;
+    margin-bottom:8px;
+  }
+
+  /* 3D Stage */
+  .stage-wrap{
+    background:var(--card);border-radius:20px;
+    padding:22px 20px;border:2px solid var(--border);
+    box-shadow:0 10px 34px rgba(151,117,250,0.12);
+    margin-bottom:14px;overflow:hidden;
+  }
+  .stage-head{
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;margin-bottom:14px;
+  }
+  .stage-head h2{
+    font-size:1.1rem;font-weight:900;color:var(--primary);
+    display:flex;align-items:center;gap:8px;
+  }
+  .stage-head h2 svg{color:var(--accent);}
+  .stage-hint{
+    font-size:.78rem;color:var(--primary-2);font-weight:700;
+    background:#F0EDFF;padding:6px 14px;border-radius:20px;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .stage-hint svg{width:14px;height:14px;}
+
+  #scene3d{
+    position:relative;width:100%;
+    height:520px;
+    border-radius:16px;overflow:hidden;
+    background:radial-gradient(ellipse at 50% 40%,#2a2455 0%,#151033 60%,#0a0820 100%);
+    cursor:grab;
+    box-shadow:inset 0 0 80px rgba(0,0,0,0.4);
+  }
+  #scene3d:active{cursor:grabbing;}
+  #scene3d canvas{display:block;border-radius:16px;}
+
+  .scene-overlay{
+    position:absolute;bottom:12px;right:14px;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(8px);
+    padding:7px 14px;border-radius:20px;
+    font-size:.78rem;color:var(--primary);font-weight:800;
+    display:flex;align-items:center;gap:6px;
+    pointer-events:none;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  }
+  .scene-overlay svg{width:14px;height:14px;}
+
+  .book-badge{
+    position:absolute;top:14px;right:14px;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(8px);
+    padding:8px 14px;border-radius:14px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.2);
+    font-size:.8rem;font-weight:800;color:var(--primary);
+    display:flex;align-items:center;gap:6px;
+  }
+  .book-badge svg{width:16px;height:16px;color:var(--accent);}
+
+  .controls{
+    display:flex;flex-wrap:wrap;gap:8px;
+    justify-content:center;margin-top:16px;
+  }
+  .ctrl-btn{
+    font-family:inherit;font-size:.88rem;font-weight:800;
+    border:none;border-radius:12px;
+    padding:11px 20px;cursor:pointer;
+    transition:all .22s;
+    display:inline-flex;align-items:center;gap:8px;
+    background:#F5F2FF;color:var(--primary-2);
+    border:2px solid #E0D9F7;
+  }
+  .ctrl-btn svg{width:16px;height:16px;}
+  .ctrl-btn:hover{background:#E7EBFF;border-color:var(--primary-2);transform:translateY(-2px);}
+  .ctrl-btn.primary{
+    background:linear-gradient(135deg,#FF6B6B,#FFA94D);
+    color:#fff;border-color:transparent;
+    box-shadow:0 6px 18px rgba(255,107,107,0.35);
+  }
+  .ctrl-btn.primary:hover{box-shadow:0 10px 24px rgba(255,107,107,0.5);}
+
+  .progress-row{
+    margin-top:14px;display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;justify-content:center;
+  }
+  .progress-bar{
+    flex:1;max-width:400px;height:12px;border-radius:20px;
+    background:#F0EDFF;overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#69DB7C,#FFD43B,#FFA94D,#FF6B6B,#9775FA);
+    width:0%;transition:width .5s ease;border-radius:20px;
+  }
+  .progress-text{font-size:.85rem;color:var(--primary);font-weight:800;}
+
+  /* Modal */
+  .modal-backdrop{
+    position:fixed;inset:0;
+    background:rgba(20,15,50,0.75);
+    backdrop-filter:blur(6px);
+    z-index:200;
+    display:none;
+    align-items:center;justify-content:center;
+    padding:20px;
+    animation:modalIn .3s ease;
+  }
+  .modal-backdrop.show{display:flex;}
+  @keyframes modalIn{from{opacity:0;}to{opacity:1;}}
+
+  .modal{
+    background:#fff;border-radius:20px;
+    max-width:820px;width:100%;
+    max-height:90vh;overflow-y:auto;
+    box-shadow:0 30px 80px rgba(0,0,0,0.35);
+    animation:modalUp .35s cubic-bezier(.2,.9,.3,1.2);
+    position:relative;
+  }
+  @keyframes modalUp{from{opacity:0;transform:translateY(40px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+  .modal-header{
+    padding:20px 24px 16px;
+    border-radius:20px 20px 0 0;
+    color:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;
+  }
+  .modal-header h2{
+    font-size:1.2rem;font-weight:900;
+    display:flex;align-items:center;gap:10px;
+  }
+  .modal-header h2 svg{width:24px;height:24px;}
+  .modal-close{
+    background:rgba(255,255,255,0.25);
+    border:1px solid rgba(255,255,255,0.4);
+    color:#fff;width:34px;height:34px;border-radius:50%;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;
+  }
+  .modal-close:hover{background:rgba(255,255,255,0.4);transform:rotate(90deg);}
+  .modal-close svg{width:18px;height:18px;}
+
+  .modal-body{
+    padding:20px 24px 24px;
+    display:grid;gap:18px;
+    grid-template-columns:1.1fr 1fr;
+  }
+  .modal-body .m-col{display:flex;flex-direction:column;gap:14px;}
+  .m-section h4{
+    font-size:.85rem;font-weight:900;color:var(--primary);
+    margin-bottom:6px;display:flex;align-items:center;gap:6px;
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  .m-section h4 svg{width:15px;height:15px;color:var(--accent);}
+  .m-section p{font-size:.92rem;color:var(--text);line-height:1.75;}
+
+  .m-diagram{
+    background:linear-gradient(135deg,#FBF9FF,#F5F9FF);
+    border-radius:14px;padding:14px;
+    border:2px dashed #D9D3F5;
+    display:flex;align-items:center;justify-content:center;
+    min-height:220px;
+  }
+  .m-diagram svg{max-width:100%;height:auto;}
+
+  .m-uses{
+    display:flex;flex-wrap:wrap;gap:6px;
+  }
+  .m-uses span{
+    background:#F0EDFF;color:var(--primary-2);
+    font-size:.75rem;font-weight:800;
+    padding:4px 12px;border-radius:20px;
+  }
+
+  .modal-footer{
+    padding:0 24px 22px;
+    display:flex;gap:10px;justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+
+  @media (max-width:760px){
+    .modal-body{grid-template-columns:1fr;}
+    .modal-header h2{font-size:1rem;}
+    #scene3d{height:400px;}
+    .tab-btn{min-width:auto;font-size:.78rem;padding:10px 9px;}
+    .tab-btn svg{width:15px;height:15px;}
+    .ctrl-btn{padding:10px 14px;font-size:.82rem;flex:1;justify-content:center;}
+    .concept-card{padding:16px;}
+    .lesson-head{padding:18px;}
+    .lesson-head h1{font-size:1.15rem;}
+  }
+
+  /* Result */
+  .result-card{
+    background:var(--card);border-radius:16px;
+    padding:22px;border:2px solid var(--border);
+    box-shadow:0 6px 20px rgba(151,117,250,0.07);
+  }
+  .result-card h2{
+    font-size:1.1rem;font-weight:900;color:var(--primary);
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .result-card h2 svg{color:var(--primary-2);}
+  .compare-table{
+    width:100%;border-collapse:collapse;margin-top:12px;
+    font-size:.86rem;border-radius:12px;overflow:hidden;
+    box-shadow:0 4px 14px rgba(151,117,250,0.06);
+  }
+  .compare-table th,.compare-table td{
+    padding:11px 13px;text-align:right;
+    border-bottom:1px solid var(--border);
+  }
+  .compare-table th{
+    background:linear-gradient(135deg,#E7EBFF,#F0EDFF);
+    color:var(--primary);font-weight:900;
+  }
+  .compare-table td{background:#fff;}
+  .compare-table tr:last-child td{border-bottom:none;}
+  .compare-table td:first-child{font-weight:800;color:var(--primary-2);}
+
+  .summary-box{
+    margin-top:16px;padding:16px;
+    background:linear-gradient(135deg,#FFF4E6,#FFE5F0);
+    border-right:5px solid #FF6B6B;
+    border-radius:12px;font-size:.92rem;
+  }
+  .summary-box h3{
+    font-size:.98rem;font-weight:900;color:#C92A2A;margin-bottom:8px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .summary-box ul{list-style:none;padding:0;}
+  .summary-box ul li{
+    padding-right:22px;position:relative;margin-bottom:6px;
+  }
+  .summary-box ul li::before{
+    content:'★';position:absolute;right:0;color:#FFA94D;
+  }
+
+  .footer{
+    text-align:center;font-size:.85rem;color:var(--text-light);
+    padding:26px 20px 30px;margin-top:10px;
+  }
+  .footer span{color:var(--primary);font-weight:800;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">
+      <i data-lucide="layout-grid"></i>
+      <span>أنواع المخططات</span>
+      <span class="chip">المحطة 2</span>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="nav-btn"><i data-lucide="home"></i> الرئيسية</a>
+      <a href="01.html" class="nav-btn"><i data-lucide="arrow-right"></i> السابق</a>
+      <a href="04.html" class="nav-btn"><i data-lucide="arrow-left"></i> التالي</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="lesson-head">
+    <h1><i data-lucide="layout-grid"></i> أنواع المخططات <span class="badge">المحطة 2</span></h1>
+    <p>هناك أنواع مختلفة من المُخَطَّطات التي يمكنك استخدامها خلال المراحل المختلفة لدورة حياة النظام. في هذا الجزء ستتعرف على 4 أنواع أساسية عبر استكشاف مكتب ثلاثي الأبعاد تفاعلي.</p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-panel="concepts" role="tab"><i data-lucide="book-open"></i> المفاهيم</button>
+    <button class="tab-btn" data-panel="office" role="tab"><i data-lucide="library"></i> المكتب 3D</button>
+    <button class="tab-btn" data-panel="result" role="tab"><i data-lucide="lightbulb"></i> استنتج</button>
+  </div>
+
+  <!-- CONCEPTS -->
+  <section class="panel active" id="panel-concepts">
+
+    <div class="concept-card">
+      <h2><i data-lucide="info"></i> تمهيد</h2>
+      <p>هناك أنواع مختلفة من المُخَطَّطات التي يمكنك استخدامها خلال المراحل المختلفة لدورة حياة النظام ومنها:</p>
+    </div>
+
+    <div class="concept-card">
+      <span class="type-pill" style="background:linear-gradient(135deg,#FF6B6B,#FF8787)"><i data-lucide="workflow" style="width:14px;height:14px"></i> النوع الأول</span>
+      <h2><i data-lucide="workflow"></i> مخطط سير العمل (Workflow Diagram)</h2>
+      <p>يشبه مُخَطَّط سير العمل المُخَطَّط الانسيابي الذي تعلمت تصميمه سابقًا لوصف خوارزمية البرنامج، ويتكون هذا المُخَطَّط من مجموعة من الرموز التي تمثل الإجراءات والعمليات المتصلة بواسطة الأسهم التي تشير إلى التدفق من رمز إلى آخر، ويُستخدم هذا المُخَطَّط سير العمل لإظهار تدفق المهام خلال كل مرحلة من مراحل دورة حياة النظام.</p>
+      <div class="def-box">
+        <strong>الاستخدام:</strong> إظهار تدفق المهام خلال كل مرحلة من مراحل دورة حياة النظام.
+      </div>
+    </div>
+
+    <div class="concept-card">
+      <span class="type-pill" style="background:linear-gradient(135deg,#9775FA,#B197FC)"><i data-lucide="users" style="width:14px;height:14px"></i> النوع الثاني</span>
+      <h2><i data-lucide="users"></i> مخطط حالة الاستخدام (Use Case Diagram)</h2>
+      <p>هو نوع من المخططات تمثل الطرق المختلفة التي قد يتفاعل بها المستخدم مع النظام، ويعدُّ استخدام مُخَطَّطات حالة الاستخدام مفيدًا جدًا لتمثيل جميع المتطلبات لنظام ما أثناء مرحلة تحليل دورة حياة النظام.</p>
+      <p><strong>مثال — نظام معلومات الطلاب:</strong></p>
+      <ul>
+        <li>الفاعلون: مسؤول شؤون التدريس، مسؤول النظام، المستخدم (الطالب)، مسؤول المعمل، مسؤول الحسابات.</li>
+        <li>حالات الاستخدام: نظام تسجيل المقررات، إدارة البيانات الأساسية، إدارة الطلبة، إدارة النتائج، إدارة الحسابات، إدارة المعمل، جدول معالجة النتائج.</li>
+      </ul>
+    </div>
+
+    <div class="concept-card">
+      <span class="type-pill" style="background:linear-gradient(135deg,#38D9A9,#63E6BE)"><i data-lucide="git-branch" style="width:14px;height:14px"></i> النوع الثالث</span>
+      <h2><i data-lucide="git-branch"></i> مخطط الشجرة (Tree Diagram)</h2>
+      <p>يمثل مُخَطَّط الشجرة التسلسل الهرمي مثل الهيكل التنظيمي لمؤسسة ما، وعادةً ما يكون الجذر في الأعلى، وعناصر الشجرة التي تسمى العُقد في الأسفل، ويُستخدم هذا المُخَطَّط على نطاق واسع في إدارة المشاريع لتقسيم المهام وتوضيح تفاصيلها الفرعية.</p>
+      <p><strong>مثال — الهيكل التنظيمي:</strong> مدير الأعمال العامة / المناطق ← المسؤولون ← الإدارات (الشؤون الإدارية، الفنية، المالية).</p>
+    </div>
+
+    <div class="concept-card">
+      <span class="type-pill" style="background:linear-gradient(135deg,#FFA94D,#FFC078)"><i data-lucide="layout" style="width:14px;height:14px"></i> النوع الرابع</span>
+      <h2><i data-lucide="layout"></i> المخطط الهيكلي (Wireframe Diagram)</h2>
+      <p>المخطّط الهيكلي هو تمثيل مرئي لإطار موقع إلكتروني أو تطبيق ذكي، ويعدّ الغرض الأساسي لهذا المخطّط هو التركيز على بنية المحتوى ووظائف العناصر التي يحتوي عليها، ولذا فهو يشتمل على عدد محدود من النصوص والرسومات، ويُستخدم هذا النوع من المخطّطات على نطاق واسع في تطوير المواقع والتطبيقات.</p>
+    </div>
+
+    <div class="concept-card">
+      <h2><i data-lucide="network"></i> أداة Freeplane</h2>
+      <p>يمكنك استخدام أداة فري بالين (Freeplane) لإنشاء خرائط ذهنية، ولكن أيضًا لإنشاء أنواع مختلفة من المُخَطَّطات.</p>
+    </div>
+
+  </section>
+
+  <!-- 3D OFFICE -->
+  <section class="panel" id="panel-office">
+    <div class="stage-wrap">
+      <div class="stage-head">
+        <h2><i data-lucide="library"></i> مكتب المخططات — انقر على أي كتاب لاستكشافه</h2>
+        <span class="stage-hint"><i data-lucide="mouse-pointer-2"></i> اسحب للتدوير • قرّب بالعجلة</span>
+      </div>
+
+      <div id="scene3d">
+        <div class="book-badge"><i data-lucide="book-marked"></i> <span id="visitedCount">زار 0 من 4</span></div>
+        <div class="scene-overlay"><i data-lucide="hand-pointer"></i> انقر على أي كتاب</div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn primary" id="resetCamBtn"><i data-lucide="camera"></i> إعادة الكاميرا</button>
+        <button class="ctrl-btn" id="tourBtn"><i data-lucide="play-circle"></i> جولة تلقائية</button>
+      </div>
+
+      <div class="progress-row">
+        <span class="progress-text" id="progressText">استكشاف 0 من 4</span>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="panel" id="panel-result">
+    <div class="result-card">
+      <h2><i data-lucide="git-compare"></i> جدول مقارنة أنواع المخططات</h2>
+      <table class="compare-table">
+        <thead>
+          <tr><th>النوع</th><th>الاستخدام الأساسي</th><th>متى يُستخدم؟</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>سير العمل</td><td>إظهار تدفق المهام والعمليات</td><td>مرحلة التحليل وتتبع العمليات</td></tr>
+          <tr><td>حالة الاستخدام</td><td>تمثيل تفاعل المستخدم مع النظام</td><td>تحليل متطلبات النظام</td></tr>
+          <tr><td>الشجرة</td><td>التسلسل الهرمي والهياكل التنظيمية</td><td>إدارة المشاريع وتقسيم المهام</td></tr>
+          <tr><td>الهيكلي</td><td>إطار موقع أو تطبيق</td><td>تطوير المواقع والتطبيقات</td></tr>
+        </tbody>
+      </table>
+
+      <div class="summary-box">
+        <h3><i data-lucide="star"></i> خلاصة الجزء</h3>
+        <ul>
+          <li><strong>مخطط سير العمل</strong> يشبه المخطط الانسيابي، ويعرض تدفق المهام في دورة حياة النظام.</li>
+          <li><strong>مخطط حالة الاستخدام</strong> يمثل تفاعل المستخدم مع النظام، ويُستخدم في تحليل المتطلبات.</li>
+          <li><strong>مخطط الشجرة</strong> يمثل التسلسل الهرمي، ويُستخدم في إدارة المشاريع.</li>
+          <li><strong>المخطط الهيكلي (Wireframe)</strong> يركز على بنية المحتوى، ويُستخدم في تطوير المواقع والتطبيقات.</li>
+          <li>يمكن استخدام <strong>Freeplane</strong> لإنشاء خرائط ذهنية وأنواع مختلفة من المخططات.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">فكرة وتصميم <span>محمد مجممي</span></footer>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal">
+    <div class="modal-header" id="modalHeader">
+      <h2><i data-lucide="book-open" id="modalIcon"></i> <span id="modalTitle">—</span></h2>
+      <button class="modal-close" id="modalClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="m-col">
+        <div class="m-section">
+          <h4><i data-lucide="info"></i> الوصف</h4>
+          <p id="modalDesc">—</p>
+        </div>
+        <div class="m-section">
+          <h4><i data-lucide="target"></i> الاستخدام</h4>
+          <div class="m-uses" id="modalUses"></div>
+        </div>
+      </div>
+      <div class="m-col">
+        <div class="m-section">
+          <h4><i data-lucide="image"></i> الرسم التوضيحي</h4>
+          <div class="m-diagram" id="modalDiagram">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="ctrl-btn" id="modalPrevBtn"><i data-lucide="arrow-right"></i> السابق</button>
+      <button class="ctrl-btn primary" id="modalNextBtn">التالي <i data-lucide="arrow-left"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    if(window.lucide) lucide.createIcons();
+    if(btn.dataset.panel === 'office') onResize();
+  });
+});
+
+/* ============ DATA ============ */
+const types = [
+  {
+    id:'workflow',
+    title:'مخطط سير العمل',
+    subtitle:'Workflow Diagram',
+    color:'#FF6B6B',
+    desc:'يشبه مُخَطَّط سير العمل المُخَطَّط الانسيابي الذي تعلمت تصميمه سابقًا لوصف خوارزمية البرنامج، ويتكون هذا المُخَطَّط من مجموعة من الرموز التي تمثل الإجراءات والعمليات المتصلة بواسطة الأسهم التي تشير إلى التدفق من رمز إلى آخر.',
+    uses:['إظهار تدفق المهام','مرحلة التحليل','دورة حياة النظام','ربط الرموز والأسهم'],
+    icon:'workflow',
+    diagram:`<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="80" width="70" height="40" rx="20" fill="#FFE3E3" stroke="#FF6B6B" stroke-width="2"/>
+      <text x="45" y="105" font-size="11" text-anchor="middle" fill="#C92A2A" font-weight="bold" font-family="Tajawal">بداية</text>
+      <line x1="80" y1="100" x2="120" y2="100" stroke="#FF6B6B" stroke-width="2" marker-end="url(#ar1)"/>
+      <rect x="120" y="78" width="80" height="44" fill="#FFE3E3" stroke="#FF6B6B" stroke-width="2"/>
+      <text x="160" y="105" font-size="11" text-anchor="middle" fill="#C92A2A" font-weight="bold" font-family="Tajawal">عملية</text>
+      <line x1="200" y1="100" x2="240" y2="100" stroke="#FF6B6B" stroke-width="2" marker-end="url(#ar1)"/>
+      <polygon points="280,80 310,100 280,120 250,100" fill="#FFE3E3" stroke="#FF6B6B" stroke-width="2"/>
+      <text x="280" y="105" font-size="10" text-anchor="middle" fill="#C92A2A" font-weight="bold" font-family="Tajawal">قرار</text>
+      <defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FF6B6B"/></marker></defs>
+      <text x="160" y="170" font-size="12" text-anchor="middle" fill="#5a6b7c" font-family="Tajawal">رموز + أسهم تدفق</text>
+    </svg>`
+  },
+  {
+    id:'usecase',
+    title:'مخطط حالة الاستخدام',
+    subtitle:'Use Case Diagram',
+    color:'#9775FA',
+    desc:'هو نوع من المخططات تمثل الطرق المختلفة التي قد يتفاعل بها المستخدم مع النظام، ويعدُّ استخدام مُخَطَّطات حالة الاستخدام مفيدًا جدًا لتمثيل جميع المتطلبات لنظام ما أثناء مرحلة تحليل دورة حياة النظام.',
+    uses:['تفاعل المستخدم مع النظام','تحليل المتطلبات','دورة حياة النظام'],
+    icon:'users',
+    diagram:`<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="60" r="10" fill="#EFE7FF" stroke="#9775FA" stroke-width="2"/>
+      <line x1="40" y1="70" x2="40" y2="95" stroke="#9775FA" stroke-width="2"/>
+      <line x1="25" y1="80" x2="55" y2="80" stroke="#9775FA" stroke-width="2"/>
+      <line x1="40" y1="95" x2="28" y2="115" stroke="#9775FA" stroke-width="2"/>
+      <line x1="40" y1="95" x2="52" y2="115" stroke="#9775FA" stroke-width="2"/>
+      <text x="40" y="135" font-size="10" text-anchor="middle" fill="#5B4BC4" font-weight="bold" font-family="Tajawal">طالب</text>
+      <ellipse cx="180" cy="50" rx="55" ry="18" fill="#EFE7FF" stroke="#9775FA" stroke-width="2"/>
+      <text x="180" y="55" font-size="10" text-anchor="middle" fill="#5B4BC4" font-weight="bold" font-family="Tajawal">تسجيل المقررات</text>
+      <ellipse cx="180" cy="100" rx="55" ry="18" fill="#EFE7FF" stroke="#9775FA" stroke-width="2"/>
+      <text x="180" y="105" font-size="10" text-anchor="middle" fill="#5B4BC4" font-weight="bold" font-family="Tajawal">إدارة النتائج</text>
+      <ellipse cx="180" cy="150" rx="55" ry="18" fill="#EFE7FF" stroke="#9775FA" stroke-width="2"/>
+      <text x="180" y="155" font-size="10" text-anchor="middle" fill="#5B4BC4" font-weight="bold" font-family="Tajawal">إدارة الحسابات</text>
+      <line x1="60" y1="60" x2="125" y2="50" stroke="#9775FA" stroke-width="1.5"/>
+      <line x1="60" y1="90" x2="125" y2="100" stroke="#9775FA" stroke-width="1.5"/>
+      <line x1="60" y1="110" x2="125" y2="150" stroke="#9775FA" stroke-width="1.5"/>
+      <text x="160" y="200" font-size="11" text-anchor="middle" fill="#5a6b7c" font-family="Tajawal">فاعل ← حالات استخدام</text>
+    </svg>`
+  },
+  {
+    id:'tree',
+    title:'مخطط الشجرة',
+    subtitle:'Tree Diagram',
+    color:'#38D9A9',
+    desc:'يمثل مُخَطَّط الشجرة التسلسل الهرمي مثل الهيكل التنظيمي لمؤسسة ما، وعادةً ما يكون الجذر في الأعلى، وعناصر الشجرة التي تسمى العُقد في الأسفل، ويُستخدم هذا المُخَطَّط على نطاق واسع في إدارة المشاريع لتقسيم المهام وتوضيح تفاصيلها الفرعية.',
+    uses:['التسلسل الهرمي','الهيكل التنظيمي','إدارة المشاريع','تقسيم المهام'],
+    icon:'git-branch',
+    diagram:`<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="115" y="10" width="90" height="30" rx="6" fill="#DFF9F1" stroke="#38D9A9" stroke-width="2"/>
+      <text x="160" y="30" font-size="11" text-anchor="middle" fill="#087F5B" font-weight="bold" font-family="Tajawal">المدير العام</text>
+      <line x1="160" y1="40" x2="160" y2="60" stroke="#38D9A9" stroke-width="2"/>
+      <line x1="60" y1="60" x2="260" y2="60" stroke="#38D9A9" stroke-width="2"/>
+      <line x1="60" y1="60" x2="60" y2="80" stroke="#38D9A9" stroke-width="2"/>
+      <line x1="160" y1="60" x2="160" y2="80" stroke="#38D9A9" stroke-width="2"/>
+      <line x1="260" y1="60" x2="260" y2="80" stroke="#38D9A9" stroke-width="2"/>
+      <rect x="20" y="80" width="80" height="26" rx="6" fill="#DFF9F1" stroke="#38D9A9" stroke-width="2"/>
+      <text x="60" y="98" font-size="10" text-anchor="middle" fill="#087F5B" font-weight="bold" font-family="Tajawal">الشؤون الإدارية</text>
+      <rect x="120" y="80" width="80" height="26" rx="6" fill="#DFF9F1" stroke="#38D9A9" stroke-width="2"/>
+      <text x="160" y="98" font-size="10" text-anchor="middle" fill="#087F5B" font-weight="bold" font-family="Tajawal">الشؤون الفنية</text>
+      <rect x="220" y="80" width="80" height="26" rx="6" fill="#DFF9F1" stroke="#38D9A9" stroke-width="2"/>
+      <text x="260" y="98" font-size="10" text-anchor="middle" fill="#087F5B" font-weight="bold" font-family="Tajawal">الشؤون المالية</text>
+      <rect x="30" y="130" width="60" height="22" rx="5" fill="#E3F9E7" stroke="#38D9A9" stroke-width="1.5"/>
+      <text x="60" y="145" font-size="9" text-anchor="middle" fill="#087F5B" font-family="Tajawal">شؤون الموظفين</text>
+      <rect x="130" y="130" width="60" height="22" rx="5" fill="#E3F9E7" stroke="#38D9A9" stroke-width="1.5"/>
+      <text x="160" y="145" font-size="9" text-anchor="middle" fill="#087F5B" font-family="Tajawal">الدعم التقني</text>
+      <rect x="230" y="130" width="60" height="22" rx="5" fill="#E3F9E7" stroke="#38D9A9" stroke-width="1.5"/>
+      <text x="260" y="145" font-size="9" text-anchor="middle" fill="#087F5B" font-family="Tajawal">الميزانية</text>
+    </svg>`
+  },
+  {
+    id:'wireframe',
+    title:'المخطط الهيكلي',
+    subtitle:'Wireframe Diagram',
+    color:'#FFA94D',
+    desc:'المخطّط الهيكلي هو تمثيل مرئي لإطار موقع إلكتروني أو تطبيق ذكي، ويعدّ الغرض الأساسي لهذا المخطّط هو التركيز على بنية المحتوى ووظائف العناصر التي يحتوي عليها، ولذا فهو يشتمل على عدد محدود من النصوص والرسومات، ويُستخدم هذا النوع من المخطّطات على نطاق واسع في تطوير المواقع والتطبيقات.',
+    uses:['إطار موقع/تطبيق','بنية المحتوى','تطوير المواقع','تطوير التطبيقات'],
+    icon:'layout',
+    diagram:`<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="15" y="10" width="290" height="180" rx="8" fill="#FFF7EB" stroke="#FFA94D" stroke-width="2"/>
+      <rect x="25" y="20" width="270" height="24" rx="4" fill="#FFEBD6"/>
+      <rect x="35" y="26" width="60" height="12" rx="2" fill="#FFA94D" opacity="0.6"/>
+      <rect x="240" y="26" width="50" height="12" rx="2" fill="#FFA94D" opacity="0.4"/>
+      <rect x="25" y="52" width="180" height="90" rx="4" fill="#FFEBD6"/>
+      <text x="115" y="100" font-size="11" text-anchor="middle" fill="#B36B00" font-weight="bold" font-family="Tajawal">صورة</text>
+      <rect x="215" y="52" width="80" height="40" rx="4" fill="#FFEBD6"/>
+      <rect x="215" y="100" width="80" height="40" rx="4" fill="#FFEBD6"/>
+      <rect x="25" y="152" width="85" height="26" rx="4" fill="#FFA94D" opacity="0.7"/>
+      <rect x="120" y="152" width="85" height="26" rx="4" fill="#FFA94D" opacity="0.7"/>
+      <rect x="215" y="152" width="80" height="26" rx="4" fill="#FFA94D" opacity="0.7"/>
+      <text x="67" y="169" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold" font-family="Tajawal">شراء</text>
+      <text x="162" y="169" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold" font-family="Tajawal">تنزيل</text>
+      <text x="255" y="169" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold" font-family="Tajawal">مشاركة</text>
+    </svg>`
+  }
+];
+
+/* ============ THREE.JS SCENE ============ */
+const sceneContainer = document.getElementById('scene3d');
+let scene, camera, renderer, controls;
+let bookMeshes = [];
+let clock;
+let raycaster, mouse;
+let autoRotate = false;
+let visited = new Set();
+
+function initThree(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0820);
+  scene.fog = new THREE.Fog(0x0a0820, 8, 22);
+
+  camera = new THREE.PerspectiveCamera(45, sceneContainer.clientWidth/sceneContainer.clientHeight, 0.1, 100);
+  camera.position.set(0, 4.5, 8);
+  camera.lookAt(0, 0.5, 0);
+
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  sceneContainer.appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 4;
+  controls.maxDistance = 15;
+  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.minPolarAngle = Math.PI / 6;
+  controls.target.set(0, 0.6, 0);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+  scene.add(ambient);
+
+  const key = new THREE.DirectionalLight(0xffffff, 0.9);
+  key.position.set(5, 10, 5);
+  key.castShadow = true;
+  key.shadow.mapSize.width = 1024;
+  key.shadow.mapSize.height = 1024;
+  key.shadow.camera.left = -8;
+  key.shadow.camera.right = 8;
+  key.shadow.camera.top = 8;
+  key.shadow.camera.bottom = -8;
+  scene.add(key);
+
+  const fill = new THREE.DirectionalLight(0xffa94d, 0.35);
+  fill.position.set(-5, 4, -5);
+  scene.add(fill);
+
+  const rim = new THREE.PointLight(0x9775fa, 0.6, 15);
+  rim.position.set(0, 3, -5);
+  scene.add(rim);
+
+  const warm = new THREE.PointLight(0xff6b6b, 0.5, 10);
+  warm.position.set(-3, 3, 2);
+  scene.add(warm);
+
+  // Floor
+  const floorGeo = new THREE.PlaneGeometry(30, 30);
+  const floorMat = new THREE.MeshStandardMaterial({color:0x1a1440, roughness:0.9, metalness:0.1});
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Grid subtle
+  const grid = new THREE.GridHelper(30, 40, 0x3b2e7e, 0x1e1850);
+  grid.position.y = 0.01;
+  scene.add(grid);
+
+  // Desk
+  buildDesk();
+
+  // Books
+  buildBooks();
+
+  // Raycaster
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+  clock = new THREE.Clock();
+
+  // Events
+  renderer.domElement.addEventListener('click', onCanvasClick);
+  renderer.domElement.addEventListener('pointermove', onCanvasMove);
+  window.addEventListener('resize', onResize);
+
+  animate();
+}
+
+function buildDesk(){
+  // Tabletop
+  const topMat = new THREE.MeshStandardMaterial({color:0x8b5a2b, roughness:0.7});
+  const top = new THREE.Mesh(new THREE.BoxGeometry(6, 0.25, 3), topMat);
+  top.position.y = 1.5;
+  top.castShadow = true;
+  top.receiveShadow = true;
+  scene.add(top);
+
+  // Legs
+  const legMat = new THREE.MeshStandardMaterial({color:0x5c3a1a, roughness:0.8});
+  const legPositions = [[-2.7, -1.3], [-2.7, 1.3], [2.7, -1.3], [2.7, 1.3]];
+  legPositions.forEach(([x,z])=>{
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.5, 0.2), legMat);
+    leg.position.set(x, 0.75, z);
+    leg.castShadow = true;
+    scene.add(leg);
+  });
+
+  // Back wall subtle
+  const wallMat = new THREE.MeshStandardMaterial({color:0x1e1850, roughness:1});
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(20, 12), wallMat);
+  wall.position.set(0, 6, -6);
+  scene.add(wall);
+
+  // Warm lamp on the desk
+  const lampBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.15, 0.2, 0.1, 16),
+    new THREE.MeshStandardMaterial({color:0x222, roughness:0.6})
+  );
+  lampBase.position.set(2.3, 1.7, -0.9);
+  lampBase.castShadow = true;
+  scene.add(lampBase);
+
+  const lampStem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.03, 0.03, 1, 8),
+    new THREE.MeshStandardMaterial({color:0x333})
+  );
+  lampStem.position.set(2.3, 2.2, -0.9);
+  scene.add(lampStem);
+
+  const lampShade = new THREE.Mesh(
+    new THREE.ConeGeometry(0.3, 0.35, 16, 1, true),
+    new THREE.MeshStandardMaterial({color:0xffa94d, emissive:0xffa94d, emissiveIntensity:0.3, side:THREE.DoubleSide})
+  );
+  lampShade.position.set(2.3, 2.75, -0.9);
+  lampShade.rotation.x = Math.PI;
+  scene.add(lampShade);
+
+  const lampLight = new THREE.PointLight(0xffa94d, 1.2, 6);
+  lampLight.position.set(2.3, 2.55, -0.9);
+  scene.add(lampLight);
+}
+
+function buildBooks(){
+  const bookGroup = new THREE.Group();
+  const startX = -2.4;
+  const gap = 1.6;
+
+  types.forEach((t, i)=>{
+    const x = startX + i * gap;
+    const z = 0;
+
+    // Book body
+    const w = 0.9, h = 1.4, d = 0.28;
+    const coverMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(t.color),
+      roughness: 0.55,
+      metalness: 0.05
+    });
+    const pagesMat = new THREE.MeshStandardMaterial({color:0xf5f0e6, roughness:0.9});
+
+    const book = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [
+      pagesMat, // +x
+      pagesMat, // -x
+      pagesMat, // +y top
+      pagesMat, // -y bottom
+      coverMat, // +z front
+      coverMat  // -z back
+    ]);
+    book.position.set(x, 1.5 + h/2 + 0.12, z);
+    book.castShadow = true;
+    book.receiveShadow = true;
+    book.userData = {typeId: t.id, index: i, baseY: book.position.y, type: t};
+
+    // Spine label — thin box on front
+    const spineMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.5});
+    const spine = new THREE.Mesh(new THREE.PlaneGeometry(w*0.85, 0.14), spineMat);
+    spine.position.set(x, 1.5 + h*0.75 + 0.12, z + d/2 + 0.005);
+    spine.material.color = new THREE.Color(0xffffff);
+    spine.userData.isSpine = true;
+
+    // Icon plate on cover
+    const iconPlate = new THREE.Mesh(
+      new THREE.CircleGeometry(0.22, 24),
+      new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.4})
+    );
+    iconPlate.position.set(x, 1.5 + h*0.35 + 0.12, z + d/2 + 0.006);
+
+    // Base glow ring
+    const ringGeo = new THREE.RingGeometry(0.6, 0.75, 40);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(t.color),
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.55
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = -Math.PI/2;
+    ring.position.set(x, 1.66, z);
+    ring.userData.isRing = true;
+
+    scene.add(book);
+    scene.add(spine);
+    scene.add(iconPlate);
+    scene.add(ring);
+
+    bookMeshes.push({book, spine, iconPlate, ring, type: t, index: i});
+  });
+}
+
+/* ============ CLICK HANDLER ============ */
+function onCanvasClick(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const targets = bookMeshes.map(b=>b.book);
+  const hits = raycaster.intersectObjects(targets, false);
+
+  if(hits.length > 0){
+    const hit = hits[0].object;
+    const item = bookMeshes.find(b=>b.book === hit);
+    if(item){
+      openModal(item.index);
+    }
+  }
+}
+
+function onCanvasMove(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const targets = bookMeshes.map(b=>b.book);
+  const hits = raycaster.intersectObjects(targets, false);
+
+  renderer.domElement.style.cursor = hits.length > 0 ? 'pointer' : 'grab';
+}
+
+/* ============ ANIMATE ============ */
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Float books gently
+  bookMeshes.forEach((b, i)=>{
+    const float = Math.sin(t * 1.2 + i * 0.8) * 0.05;
+    b.book.position.y = b.book.userData.baseY + float;
+    b.spine.position.y = b.book.position.y + 0.5;
+    b.iconPlate.position.y = b.book.position.y - 0.15;
+    b.ring.rotation.z = t * 0.4 + i;
+    b.ring.material.opacity = 0.4 + Math.sin(t*1.5 + i)*0.15;
+  });
+
+  // Auto tour
+  if(autoRotate){
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.2;
+  } else {
+    controls.autoRotate = false;
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+/* ============ RESIZE ============ */
+function onResize(){
+  if(!renderer || !camera) return;
+  const w = sceneContainer.clientWidth;
+  const h = sceneContainer.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+
+/* ============ MODAL ============ */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalHeader = document.getElementById('modalHeader');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const modalUses = document.getElementById('modalUses');
+const modalDiagram = document.getElementById('modalDiagram');
+let currentModalIndex = 0;
+
+function openModal(index){
+  currentModalIndex = index;
+  const t = types[index];
+  visited.add(t.id);
+  updateProgress();
+
+  modalHeader.style.background = `linear-gradient(135deg,${t.color},${t.color}bb)`;
+  modalTitle.textContent = t.title;
+  modalDesc.textContent = t.desc;
+  modalUses.innerHTML = t.uses.map(u=>`<span>${u}</span>`).join('');
+  modalDiagram.innerHTML = t.diagram;
+
+  modalBackdrop.classList.add('show');
+  if(window.lucide) lucide.createIcons();
+}
+
+function closeModal(){
+  modalBackdrop.classList.remove('show');
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click',(e)=>{
+  if(e.target === modalBackdrop) closeModal();
+});
+document.getElementById('modalNextBtn').addEventListener('click',()=>{
+  openModal((currentModalIndex + 1) % types.length);
+});
+document.getElementById('modalPrevBtn').addEventListener('click',()=>{
+  openModal((currentModalIndex - 1 + types.length) % types.length);
+});
+
+/* ============ PROGRESS ============ */
+function updateProgress(){
+  const n = visited.size;
+  document.getElementById('visitedCount').textContent = `زار ${n} من 4`;
+  document.getElementById('progressText').textContent = `استكشاف ${n} من 4`;
+  document.getElementById('progressFill').style.width = (n/4*100) + '%';
+}
+
+/* ============ CONTROLS ============ */
+document.getElementById('resetCamBtn').addEventListener('click',()=>{
+  camera.position.set(0, 4.5, 8);
+  controls.target.set(0, 0.6, 0);
+  controls.update();
+});
+
+const tourBtn = document.getElementById('tourBtn');
+tourBtn.addEventListener('click',()=>{
+  autoRotate = !autoRotate;
+  tourBtn.innerHTML = autoRotate
+    ? '<i data-lucide="pause-circle"></i> إيقاف الجولة'
+    : '<i data-lucide="play-circle"></i> جولة تلقائية';
+  if(window.lucide) lucide.createIcons();
+});
+
+/* ============ INIT ============ */
+if(window.THREE){
+  initThree();
+  setTimeout(()=>onResize(), 100);
+}
+if(window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>

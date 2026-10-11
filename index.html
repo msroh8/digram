@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء المخطط — التقنية الرقمية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --primary:#1a3a5c;
+    --primary-light:#2a5480;
+    --secondary:#2d8a7e;
+    --accent:#e67e22;
+    --accent-dark:#c96a15;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --text:#2c3e50;
+    --text-light:#5a6b7c;
+    --border:#e1e8ef;
+    --success:#27ae60;
+    --error:#e74c3c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+
+  /* ===== Header ===== */
+  .header{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;
+    padding:24px 20px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .header::after{
+    content:'';
+    position:absolute;
+    bottom:-30px;left:-30px;
+    width:180px;height:180px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+  }
+  .header-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;flex-wrap:wrap;gap:16px;
+    align-items:center;justify-content:space-between;
+    position:relative;z-index:1;
+  }
+  .header-title h1{font-size:1.8rem;font-weight:800;letter-spacing:-0.5px;}
+  .header-title p{font-size:1rem;opacity:.85;margin-top:4px;}
+  .header-meta{
+    display:flex;flex-wrap:wrap;gap:10px;
+  }
+  .meta-chip{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.25);
+    padding:6px 14px;border-radius:20px;
+    font-size:.85rem;font-weight:500;
+    display:flex;align-items:center;gap:6px;
+    backdrop-filter:blur(4px);
+  }
+  .meta-chip svg{width:16px;height:16px;}
+
+  /* ===== Main container ===== */
+  .container{max-width:1100px;margin:0 auto;padding:0 20px;}
+
+  /* ===== Intro card ===== */
+  .intro-card{
+    background:var(--card);
+    border-radius:16px;
+    padding:24px 26px;
+    margin-top:-18px;
+    position:relative;z-index:2;
+    box-shadow:0 6px 24px rgba(26,58,92,0.08);
+    border:1px solid var(--border);
+  }
+  .intro-card h2{
+    font-size:1.15rem;font-weight:700;
+    color:var(--primary);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .intro-card p{color:var(--text-light);font-size:.98rem;}
+
+  /* ===== Outcomes ===== */
+  .outcomes{
+    margin-top:16px;
+    background:#f0f6ff;
+    border-right:4px solid var(--primary);
+    border-radius:10px;
+    padding:14px 18px;
+  }
+  .outcomes h3{
+    font-size:1rem;font-weight:700;color:var(--primary);
+    margin-bottom:8px;display:flex;align-items:center;gap:6px;
+  }
+  .outcomes ul{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 16px;}
+  .outcomes li{
+    font-size:.9rem;color:var(--text);
+    padding-right:20px;position:relative;
+  }
+  .outcomes li::before{
+    content:'✓';
+    position:absolute;right:0;top:0;
+    color:var(--secondary);font-weight:700;
+  }
+
+  /* ===== Tabs ===== */
+  .tabs-wrap{margin-top:20px;}
+  .tabs{
+    display:flex;gap:6px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:6px;
+    box-shadow:0 4px 14px rgba(26,58,92,0.06);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    flex:1;min-width:130px;
+    border:none;background:transparent;
+    font-family:inherit;
+    font-size:.92rem;font-weight:600;
+    color:var(--text-light);
+    padding:11px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all .25s ease;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    white-space:nowrap;
+  }
+  .tab-btn svg{width:17px;height:17px;}
+  .tab-btn:hover{background:#eef3f9;color:var(--primary);}
+  .tab-btn.active{
+    background:var(--primary);color:#fff;
+    box-shadow:0 3px 10px rgba(26,58,92,0.25);
+  }
+
+  /* ===== Panels ===== */
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== Journey map ===== */
+  .journey{
+    background:var(--card);
+    border-radius:16px;
+    margin-top:14px;
+    padding:28px 20px 32px;
+    border:1px solid var(--border);
+    box-shadow:0 6px 20px rgba(26,58,92,0.06);
+    position:relative;
+    overflow:hidden;
+  }
+  .journey::before{
+    content:'';
+    position:absolute;inset:0;
+    background-image:radial-gradient(#dfe7ef 1px,transparent 1px);
+    background-size:22px 22px;
+    opacity:.5;pointer-events:none;
+  }
+  .journey-head{
+    text-align:center;margin-bottom:24px;position:relative;z-index:1;
+  }
+  .journey-head h2{
+    font-size:1.25rem;font-weight:800;color:var(--primary);
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .journey-head p{font-size:.88rem;color:var(--text-light);margin-top:4px;}
+
+  .flow{
+    display:flex;align-items:stretch;justify-content:center;
+    gap:0;flex-wrap:wrap;
+    position:relative;z-index:1;
+    padding:10px 0;
+  }
+  .station{
+    flex:0 0 auto;width:170px;
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:16px 12px;
+    text-align:center;
+    cursor:pointer;
+    text-decoration:none;
+    color:inherit;
+    transition:all .28s ease;
+    position:relative;
+    margin:6px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    box-shadow:0 2px 8px rgba(26,58,92,0.04);
+  }
+  .station:hover{
+    transform:translateY(-5px);
+    border-color:var(--accent);
+    box-shadow:0 10px 24px rgba(230,126,34,0.18);
+  }
+  .station .num{
+    position:absolute;top:-12px;right:14px;
+    width:26px;height:26px;border-radius:50%;
+    background:var(--primary);color:#fff;
+    font-size:.78rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  }
+  .station .icon{
+    width:44px;height:44px;border-radius:12px;
+    background:#eef4fa;color:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    margin-top:4px;
+  }
+  .station .icon svg{width:22px;height:22px;}
+  .station h3{font-size:.88rem;font-weight:700;color:var(--text);line-height:1.35;}
+  .station p{font-size:.76rem;color:var(--text-light);line-height:1.45;}
+  .station .wip{
+    font-size:.68rem;font-weight:600;
+    color:var(--accent-dark);
+    background:#fff4e6;
+    padding:2px 8px;border-radius:10px;
+    margin-top:auto;
+  }
+  .station.ready{
+    border-color:var(--secondary);
+    background:linear-gradient(180deg,#f4fbf9 0%,#fff 60%);
+  }
+  .station.ready .num{background:var(--secondary);}
+  .station.ready .icon{background:#e2f3ef;color:var(--secondary);}
+  .station.ready .wip{color:#16654f;background:#e2f3ef;}
+  .station:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+
+  /* connector arrow between stations (desktop) */
+  .arrow{
+    align-self:center;
+    color:#c5d2de;
+    display:flex;align-items:center;
+    flex:0 0 auto;
+  }
+  .arrow svg{width:26px;height:26px;}
+
+  /* ===== Quiz ===== */
+  .quiz{
+    background:var(--card);
+    border-radius:16px;
+    margin-top:14px;
+    padding:24px 22px;
+    border:1px solid var(--border);
+    box-shadow:0 6px 20px rgba(26,58,92,0.06);
+  }
+  .quiz-head{
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:6px;
+  }
+  .quiz-head h2{font-size:1.15rem;font-weight:800;color:var(--primary);}
+  .quiz-head .badge{
+    background:#eef4fa;color:var(--primary);
+    font-size:.75rem;font-weight:700;
+    padding:3px 10px;border-radius:10px;
+  }
+  .quiz-sub{font-size:.86rem;color:var(--text-light);margin-bottom:18px;}
+
+  .q-block{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 16px 14px;
+    margin-bottom:14px;
+    background:#fbfdff;
+    transition:border-color .25s;
+  }
+  .q-block.answered{border-color:#cfdbe6;}
+  .q-text{
+    font-size:.95rem;font-weight:700;color:var(--text);
+    margin-bottom:12px;display:flex;gap:8px;
+  }
+  .q-index{
+    flex:0 0 auto;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--primary);color:#fff;
+    font-size:.8rem;display:flex;align-items:center;justify-content:center;
+  }
+  .options{display:grid;gap:8px;}
+  .option{
+    border:1.5px solid var(--border);
+    background:#fff;
+    border-radius:10px;
+    padding:11px 14px;
+    font-size:.9rem;font-family:inherit;
+    color:var(--text);
+    cursor:pointer;text-align:right;
+    transition:all .2s ease;
+    display:flex;align-items:center;gap:10px;
+    width:100%;
+  }
+  .option .mark{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    border:2px solid #c5d2de;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.72rem;font-weight:700;color:transparent;
+    transition:all .2s;
+  }
+  .option:hover:not(:disabled){border-color:var(--primary-light);background:#f5f9ff;}
+  .option:disabled{cursor:default;}
+  .option.correct{border-color:var(--success);background:#eafaf1;}
+  .option.correct .mark{background:var(--success);border-color:var(--success);color:#fff;}
+  .option.wrong{border-color:var(--error);background:#fdecea;}
+  .option.wrong .mark{background:var(--error);border-color:var(--error);color:#fff;}
+  .option.dim{opacity:.55;}
+
+  .feedback{
+    font-size:.85rem;margin-top:10px;
+    padding:9px 12px;border-radius:8px;
+    display:none;line-height:1.6;
+  }
+  .feedback.show{display:block;animation:fadeUp .3s ease;}
+  .feedback.ok{background:#eafaf1;color:#1e7a45;border-right:3px solid var(--success);}
+  .feedback.no{background:#fdecea;color:#a93226;border-right:3px solid var(--error);}
+
+  .quiz-actions{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-top:8px;
+  }
+  .btn{
+    font-family:inherit;font-size:.92rem;font-weight:700;
+    border:none;border-radius:10px;
+    padding:11px 22px;cursor:pointer;
+    transition:all .22s ease;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn svg{width:17px;height:17px;}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(230,126,34,0.3);}
+  .btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);}
+  .btn-ghost{background:#eef3f9;color:var(--primary);}
+  .btn-ghost:hover{background:#dde8f2;}
+
+  .result{
+    margin-top:16px;
+    border-radius:12px;
+    padding:16px 18px;
+    display:none;
+    align-items:center;gap:14px;
+    background:linear-gradient(135deg,#eef4fa,#f5f9ff);
+    border:1px solid #d6e3ef;
+  }
+  .result.show{display:flex;animation:fadeUp .35s ease;}
+  .result .score-ring{
+    flex:0 0 auto;width:62px;height:62px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:1.15rem;color:#fff;
+    background:var(--primary);
+    box-shadow:0 4px 12px rgba(26,58,92,0.25);
+  }
+  .result .score-ring.pass{background:var(--secondary);}
+  .result .score-ring.fail{background:var(--accent);}
+  .result .res-text h3{font-size:1rem;font-weight:800;color:var(--primary);margin-bottom:2px;}
+  .result .res-text p{font-size:.85rem;color:var(--text-light);}
+
+  /* ===== Footer ===== */
+  .footer{
+    text-align:center;
+    font-size:.82rem;color:var(--text-light);
+    padding:26px 20px 30px;
+    margin-top:8px;
+  }
+  .footer span{color:var(--primary);font-weight:600;}
+
+  /* ===== Responsive ===== */
+  @media (max-width:760px){
+    .header-title h1{font-size:1.4rem;}
+    .header-meta{width:100%;}
+    .meta-chip{font-size:.78rem;padding:5px 11px;}
+    .flow{flex-direction:column;align-items:center;}
+    .arrow{transform:rotate(90deg);margin:-2px 0;}
+    .station{width:100%;max-width:320px;}
+    .tab-btn{min-width:auto;font-size:.82rem;padding:10px 10px;}
+    .intro-card{padding:20px 18px;}
+    .journey{padding:22px 14px 26px;}
+    .quiz{padding:20px 16px;}
+    .option{font-size:.86rem;padding:12px 12px;}
+    .result{flex-direction:column;text-align:center;gap:10px;}
+  }
+  @media (min-width:761px) and (max-width:1024px){
+    .station{width:150px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-title">
+      <h1>إنشاء المخطط</h1>
+      <p>التقنية الرقمية — الثالث الثانوي</p>
+    </div>
+    <div class="header-meta">
+      <span class="meta-chip"><i data-lucide="user"></i> محمد مجممي</span>
+      <span class="meta-chip"><i data-lucide="school"></i> ثانوية دار التوحيد</span>
+      <span class="meta-chip"><i data-lucide="book-open"></i> التقنية الرقمية</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ================= INTRO ================= -->
+  <section class="intro-card">
+    <h2><i data-lucide="compass"></i> مدخل الدرس</h2>
+    <p>
+      يُعدُّ المُخَطَّط أداة قيّمة للمؤسسات لتمثيل سلسلة من الخطوات أو المهام التي تشكل عملية بشكل مرئي،
+      كما يعدُّ مهمًا لأنه يبسِّط العمليات المعقدة إلى خطوات يسهل فهمها بشكل واضح، ومن خلال تحليل
+      المُخَطَّط يمكن تحديد أوجه القصور ونقاط الضعف.
+    </p>
+    <div class="outcomes">
+      <h3><i data-lucide="target"></i> نواتج التعلم</h3>
+      <ul>
+        <li>تعريف المخطط وأهميته في تبسيط العمليات.</li>
+        <li>التمييز بين أنواع المخططات: سير العمل، حالة الاستخدام، الشجرة، الهيكلي.</li>
+        <li>تحديد الأشكال الأساسية لمخطط سير العمل ووظيفة كل شكل.</li>
+        <li>التعرف على واجهة تطبيق draw.io وأدواته.</li>
+        <li>إنشاء مخطط سير عمل كامل باستخدام draw.io.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= TABS ================= -->
+  <div class="tabs-wrap">
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-panel="journey" role="tab">
+        <i data-lucide="map"></i> رحلة التعلم
+      </button>
+      <button class="tab-btn" data-panel="quiz" role="tab">
+        <i data-lucide="clipboard-check"></i> الاختبار التشخيصي
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= JOURNEY PANEL ================= -->
+  <section class="panel active" id="panel-journey">
+    <div class="journey">
+      <div class="journey-head">
+        <h2><i data-lucide="route"></i> خريطة رحلة التعلم</h2>
+        <p>ست محطات متتابعة على هيئة مخطط سير عمل. انقر على أي محطة للدخول إليها.</p>
+      </div>
+
+      <div class="flow">
+        <!-- Station 1 -->
+        <a class="station ready" href="01.html" title="المخططات ومخطط سير العمل">
+          <span class="num">1</span>
+          <span class="icon"><i data-lucide="file-text"></i></span>
+          <h3>المخططات ومخطط سير العمل</h3>
+          <p>تعريف المخطط وأهميته ومخطط سير العمل</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+
+        <div class="arrow"><i data-lucide="arrow-left"></i></div>
+
+        <!-- Station 2 -->
+        <a class="station ready" href="02.html" title="أنواع المخططات">
+          <span class="num">2</span>
+          <span class="icon"><i data-lucide="git-branch"></i></span>
+          <h3>أنواع المخططات</h3>
+          <p>حالة الاستخدام، الشجرة، الهيكلي</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+
+        <div class="arrow"><i data-lucide="arrow-left"></i></div>
+
+        <!-- Station 3 -->
+        <a class="station ready" href="04.html" title="الأشكال الأساسية لمخطط سير العمل">
+          <span class="num">3</span>
+          <span class="icon"><i data-lucide="shapes"></i></span>
+          <h3>الأشكال الأساسية لمخطط سير العمل</h3>
+          <p>الأشكال الستة الأساسية ووظائفها</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+
+        <div class="arrow"><i data-lucide="arrow-left"></i></div>
+
+        <!-- Station 4 -->
+        <a class="station ready" href="05.html" title="تطبيق draw.io">
+          <span class="num">4</span>
+          <span class="icon"><i data-lucide="layout-dashboard"></i></span>
+          <h3>تطبيق draw.io</h3>
+          <p>واجهة التطبيق وأدواته</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+
+        <div class="arrow"><i data-lucide="arrow-left"></i></div>
+
+        <!-- Station 5 -->
+        <a class="station ready" href="06.html" title="إنشاء مخطط سير عمل تطبيق صيانة">
+          <span class="num">5</span>
+          <span class="icon"><i data-lucide="hammer"></i></span>
+          <h3>إنشاء مخطط سير عمل تطبيق صيانة</h3>
+          <p>تطبيق عملي كامل</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+
+        <div class="arrow"><i data-lucide="arrow-left"></i></div>
+
+        <!-- Station 6 -->
+        <a class="station ready" href="07.html" title="مكتبة المصادر والاختبار الختامي">
+          <span class="num">6</span>
+          <span class="icon"><i data-lucide="library-big"></i></span>
+          <h3>مكتبة المصادر والاختبار الختامي</h3>
+          <p>مصادر إثرائية وتقويم ختامي للتعلم</p>
+          <span class="wip">افتح المحطة</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ PANEL ================= -->
+  <section class="panel" id="panel-quiz">
+    <div class="quiz">
+      <div class="quiz-head">
+        <h2><i data-lucide="clipboard-check"></i> الاختبار التشخيصي</h2>
+        <span class="badge">4 أسئلة</span>
+      </div>
+      <p class="quiz-sub">يهدف هذا الاختبار إلى قياس معرفتك السابقة. لا يوجد نجاح أو رسوب، ولا يمنعك من متابعة الدرس.</p>
+
+      <div id="quizContainer"></div>
+
+      <div class="quiz-actions">
+        <button class="btn btn-ghost" id="resetQuizBtn">
+          <i data-lucide="rotate-ccw"></i> إعادة المحاولة
+        </button>
+      </div>
+
+      <div class="result" id="quizResult">
+        <div class="score-ring" id="scoreRing">0/4</div>
+        <div class="res-text">
+          <h3 id="resultTitle">—</h3>
+          <p id="resultMsg">—</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  فكرة وتصميم <span>محمد مجممي</span>
+</footer>
+
+<script>
+/* ================= TABS ================= */
+const tabButtons = document.querySelectorAll('.tab-btn');
+const panels = {
+  journey: document.getElementById('panel-journey'),
+  quiz: document.getElementById('panel-quiz')
+};
+tabButtons.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    tabButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    Object.values(panels).forEach(p=>p.classList.remove('active'));
+    panels[btn.dataset.panel].classList.add('active');
+    if(window.lucide) lucide.createIcons();
+  });
+});
+
+/* ================= STATIONS ================= */
+/* Navigation is provided natively by station links, including keyboard support. */
+
+/* ================= QUIZ DATA ================= */
+const quizData = [
+  {
+    q: "ما المقصود بالمخطط؟",
+    options: [
+      "صورة فنية للزينة",
+      "تمثيل مرئي للمعلومات باستخدام الأشكال والأسهم",
+      "جدول بيانات رقمي",
+      "نص مكتوب طويل"
+    ],
+    correct: 1,
+    feedbackOk: "أحسنت! المخطط هو تمثيل مرئي للمعلومات باستخدام الأشكال والأسهم لعرض الترتيبات والعلاقات.",
+    feedbackNo: "الإجابة الصحيحة هي: تمثيل مرئي للمعلومات باستخدام الأشكال والأسهم. المخطط أداة لتمثيل العلاقات والترتيبات."
+  },
+  {
+    q: "أيٌّ مما يلي يُعدُّ من أهم فوائد استخدام المخططات في المؤسسات؟",
+    options: [
+      "زيادة عدد الصفحات",
+      "تبسيط العمليات المعقدة إلى خطوات يسهل فهمها",
+      "استبدال الموظفين",
+      "إخفاء المعلومات"
+    ],
+    correct: 1,
+    feedbackOk: "إجابة صحيحة! المخطط يبسِّط العمليات المعقدة إلى خطوات واضحة يسهل فهمها.",
+    feedbackNo: "الإجابة الصحيحة هي: تبسيط العمليات المعقدة إلى خطوات يسهل فهمها. هذا هو الهدف الجوهري من المخططات."
+  },
+  {
+    q: "ما الشكل الذي يُستخدم عادةً لتمثيل \"اتخاذ القرار\" في مخطط سير العمل؟",
+    options: [
+      "المستطيل",
+      "البيضاوي",
+      "المعين",
+      "متوازي الأضلاع"
+    ],
+    correct: 2,
+    feedbackOk: "ممتاز! المعين يُستخدم لتمثيل القرار الذي يلزم اتخاذه ويؤدي إلى عملية أو قرار آخر.",
+    feedbackNo: "الإجابة الصحيحة هي: المعين. فهو يمثل قرارًا يلزم اتخاذه، بينما المستطيل للعملية والبيضاوي للبداية والنهاية."
+  },
+  {
+    q: "ما اسم الأداة المجانية مفتوحة المصدر المستخدمة في الدرس لرسم المخططات؟",
+    options: [
+      "Photoshop",
+      "draw.io (ديجارام)",
+      "Excel",
+      "Word"
+    ],
+    correct: 1,
+    feedbackOk: "صحيح! تطبيق ديجارام draw.io مجاني ومفتوح المصدر ويمكن استخدامه لرسم جميع أنواع المخططات تقريبًا.",
+    feedbackNo: "الإجابة الصحيحة هي: draw.io (ديجارام). إنه التطبيق المجاني مفتوح المصدر المستخدم في الدرس."
+  }
+];
+
+/* ================= QUIZ RENDER ================= */
+const quizContainer = document.getElementById('quizContainer');
+const resultBox = document.getElementById('quizResult');
+const scoreRing = document.getElementById('scoreRing');
+const resultTitle = document.getElementById('resultTitle');
+const resultMsg = document.getElementById('resultMsg');
+
+let answered = new Array(quizData.length).fill(null);
+
+function renderQuiz(){
+  quizContainer.innerHTML = '';
+  answered = new Array(quizData.length).fill(null);
+  resultBox.classList.remove('show');
+
+  quizData.forEach((item, qi)=>{
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.id = 'q-block-' + qi;
+
+    block.innerHTML = `
+      <div class="q-text">
+        <span class="q-index">${qi+1}</span>
+        <span>${item.q}</span>
+      </div>
+      <div class="options" id="options-${qi}"></div>
+      <div class="feedback" id="fb-${qi}"></div>
+    `;
+
+    const optsWrap = block.querySelector('#options-' + qi);
+    item.options.forEach((opt, oi)=>{
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="mark">${String.fromCharCode(65+oi)}</span><span>${opt}</span>`;
+      btn.addEventListener('click',()=>selectOption(qi, oi));
+      optsWrap.appendChild(btn);
+    });
+
+    quizContainer.appendChild(block);
+  });
+
+  if(window.lucide) lucide.createIcons();
+}
+
+function selectOption(qi, oi){
+  if(answered[qi] !== null) return; // already answered
+
+  answered[qi] = oi;
+  const item = quizData[qi];
+  const block = document.getElementById('q-block-' + qi);
+  const opts = block.querySelectorAll('.option');
+  const fb = document.getElementById('fb-' + qi);
+
+  block.classList.add('answered');
+
+  opts.forEach((btn, idx)=>{
+    btn.disabled = true;
+    if(idx === item.correct){
+      btn.classList.add('correct');
+      btn.querySelector('.mark').textContent = '✓';
+    } else if(idx === oi){
+      btn.classList.add('wrong');
+      btn.querySelector('.mark').textContent = '✕';
+    } else {
+      btn.classList.add('dim');
+    }
+  });
+
+  if(oi === item.correct){
+    fb.className = 'feedback ok show';
+    fb.textContent = item.feedbackOk;
+  } else {
+    fb.className = 'feedback no show';
+    fb.textContent = item.feedbackNo;
+  }
+
+  // Check if all answered
+  if(answered.every(a=>a !== null)){
+    showResult();
+  }
+}
+
+function showResult(){
+  const score = answered.reduce((acc, a, i)=> acc + (a === quizData[i].correct ? 1 : 0), 0);
+  const total = quizData.length;
+  const passed = score >= 3;
+
+  scoreRing.textContent = score + '/' + total;
+  scoreRing.classList.remove('pass','fail');
+  scoreRing.classList.add(passed ? 'pass' : 'fail');
+
+  resultTitle.textContent = passed
+    ? 'أداء ممتاز! أنت جاهز لبدء الدرس.'
+    : 'لا بأس، يمكنك متابعة الدرس والاستفادة منه.';
+
+  resultMsg.textContent = passed
+    ? 'لديك معرفة سابقة جيدة بموضوع المخططات. انطلق إلى المحطة الأولى.'
+    : 'الدرس سيساعدك على بناء المفاهيم خطوة بخطوة، فلا تقلق.';
+
+  resultBox.classList.add('show');
+  if(window.lucide) lucide.createIcons();
+}
+
+document.getElementById('resetQuizBtn').addEventListener('click',()=>{
+  renderQuiz();
+});
+
+/* ================= INIT ================= */
+renderQuiz();
+if(window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأشكال الأساسية لمخطط سير العمل — إنشاء المخطط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --bg-0:#0B1220;
+    --bg-1:#131C2E;
+    --bg-2:#1C2740;
+    --bg-3:#243352;
+    --metal-1:#6B7A99;
+    --metal-2:#C7D0E0;
+    --metal-3:#8B9AB8;
+    --neon-cyan:#22D3EE;
+    --neon-blue:#38BDF8;
+    --neon-green:#10B981;
+    --neon-yellow:#FBBF24;
+    --neon-orange:#F97316;
+    --neon-purple:#A855F7;
+    --neon-pink:#F472B6;
+    --text:#E2E8F0;
+    --text-light:#94A3B8;
+    --text-dim:#64748B;
+    --success:#10B981;
+    --error:#EF4444;
+
+    --shadow-card:
+      0 10px 30px rgba(0,0,0,0.55),
+      0 2px 6px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    --shadow-hover:
+      0 18px 40px rgba(0,0,0,0.65),
+      0 4px 10px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    --border-metal: linear-gradient(135deg,#6B7A99 0%,#C7D0E0 45%,#8B9AB8 60%,#6B7A99 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(34,211,238,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 100%, rgba(168,85,247,0.08) 0%, transparent 45%),
+      linear-gradient(180deg,var(--bg-0) 0%,var(--bg-1) 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+
+  /* subtle grid overlay */
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+    background-size:52px 52px;
+    pointer-events:none;
+    z-index:0;
+  }
+  body > *{position:relative;z-index:1;}
+
+  /* ============ METAL CARD ============ */
+  .metal-card{
+    position:relative;
+    background:linear-gradient(135deg,var(--bg-2) 0%,var(--bg-1) 100%);
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid transparent;
+    background-clip:padding-box;
+  }
+  .metal-card::before{
+    content:'';
+    position:absolute;inset:-2px;
+    border-radius:20px;
+    background:var(--border-metal);
+    z-index:-1;
+    opacity:0.55;
+  }
+  .metal-card::after{
+    content:'';
+    position:absolute;inset:0;
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 30%);
+    pointer-events:none;
+  }
+
+  /* ============ TOPBAR ============ */
+  .topbar{
+    padding:16px 20px;
+    background:linear-gradient(135deg,#0d1828 0%,#1a2942 50%,#0d1828 100%);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,#22D3EE 0%,#A855F7 50%,#F472B6 100%) 1;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 6px 30px rgba(34,211,238,0.15);
+  }
+  .topbar-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+  }
+  .topbar-title{
+    display:flex;align-items:center;gap:10px;
+    font-weight:800;font-size:1rem;color:#fff;
+  }
+  .topbar-title .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(34,211,238,0.5);
+  }
+  .topbar-title .icon-badge svg{width:20px;height:20px;color:#0B1220;}
+  .topbar-title .chip{
+    background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(168,85,247,0.2));
+    border:1px solid rgba(34,211,238,0.4);
+    padding:4px 12px;border-radius:20px;
+    font-size:.74rem;font-weight:700;
+    color:#22D3EE;
+    text-shadow:0 0 8px rgba(34,211,238,0.5);
+  }
+  .nav-buttons{display:flex;gap:8px;flex-wrap:wrap;}
+  .nav-btn{
+    background:linear-gradient(135deg,rgba(107,122,153,0.25),rgba(199,208,224,0.15));
+    border:1px solid rgba(199,208,224,0.3);
+    color:#E2E8F0;text-decoration:none;
+    padding:7px 14px;border-radius:10px;
+    font-size:.85rem;font-weight:700;font-family:inherit;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .22s;cursor:pointer;
+    backdrop-filter:blur(6px);
+  }
+  .nav-btn:hover{
+    border-color:#22D3EE;
+    box-shadow:0 0 15px rgba(34,211,238,0.35);
+    transform:translateY(-1px);
+  }
+  .nav-btn svg{width:15px;height:15px;}
+
+  .container{max-width:1180px;margin:0 auto;padding:22px 20px 0;}
+
+  /* ============ LESSON HEAD ============ */
+  .lesson-head{
+    padding:22px 24px;margin-bottom:18px;
+  }
+  .lesson-head h1{
+    font-size:1.5rem;font-weight:900;
+    display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;
+    color:#fff;
+  }
+  .lesson-head h1 .badge{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;font-size:.72rem;font-weight:800;
+    padding:4px 12px;border-radius:20px;
+    box-shadow:0 0 15px rgba(168,85,247,0.4);
+  }
+  .lesson-head p{font-size:.96rem;color:var(--text-light);}
+
+  /* ============ TABS ============ */
+  .tabs{
+    display:flex;gap:6px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:14px;padding:6px;margin-bottom:16px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    flex:1;min-width:130px;border:none;background:transparent;
+    font-family:inherit;font-size:.9rem;font-weight:800;
+    color:var(--text-light);padding:11px 14px;border-radius:10px;
+    cursor:pointer;transition:all .25s;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    white-space:nowrap;
+  }
+  .tab-btn svg{width:17px;height:17px;}
+  .tab-btn:hover{background:rgba(34,211,238,0.08);color:#22D3EE;}
+  .tab-btn.active{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:
+      0 0 20px rgba(34,211,238,0.6),
+      0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="match"].active{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 0 20px rgba(168,85,247,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tab-btn[data-panel="build"].active{
+    background:linear-gradient(135deg,#FBBF24,#F97316);
+    color:#0B1220;
+    box-shadow:0 0 20px rgba(251,191,36,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ============ CONCEPT / SYMBOLS PANEL ============ */
+  .symbol-grid{
+    display:grid;gap:14px;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    padding:22px;
+    margin-bottom:16px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+  }
+  .symbol-card{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border-radius:14px;
+    padding:16px 12px 14px;
+    text-align:center;
+    cursor:pointer;
+    transition:all .3s cubic-bezier(.2,.9,.3,1.2);
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    border:1px solid rgba(107,122,153,0.3);
+    box-shadow:
+      0 6px 16px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .symbol-card::before{
+    content:'';
+    position:absolute;inset:-1px;
+    border-radius:14px;
+    background:var(--border-metal);
+    z-index:-1;
+    opacity:0.4;
+    transition:opacity .3s;
+  }
+  .symbol-card .symbol-svg{
+    width:80px;height:60px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .3s;
+  }
+  .symbol-card h4{
+    font-size:.86rem;font-weight:800;color:#fff;
+    letter-spacing:.2px;
+  }
+  .symbol-card p{
+    font-size:.72rem;color:var(--text-dim);font-weight:700;
+    letter-spacing:.3px;text-transform:uppercase;
+  }
+  .symbol-card:hover{
+    transform:translateY(-6px);
+    box-shadow:var(--shadow-hover);
+  }
+  .symbol-card:hover::before{opacity:0.9;}
+  .symbol-card.visited{
+    border-color:rgba(34,211,238,0.5);
+  }
+  .symbol-card.visited::after{
+    content:'✓';
+    position:absolute;top:8px;left:8px;
+    width:22px;height:22px;border-radius:50%;
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;font-weight:900;font-size:.75rem;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 10px rgba(34,211,238,0.6);
+  }
+
+  /* Per-symbol colors */
+  .symbol-card[data-shape="oval"]{--shape-color:#10B981;}
+  .symbol-card[data-shape="rect"]{--shape-color:#38BDF8;}
+  .symbol-card[data-shape="diamond"]{--shape-color:#FBBF24;}
+  .symbol-card[data-shape="doc"]{--shape-color:#F97316;}
+  .symbol-card[data-shape="parallelogram"]{--shape-color:#A855F7;}
+  .symbol-card[data-shape="arrow"]{--shape-color:#F472B6;}
+
+  .symbol-card:hover svg [stroke]{
+    filter:drop-shadow(0 0 8px var(--shape-color));
+  }
+
+  /* Detail box */
+  .symbol-detail{
+    padding:18px 22px;margin-bottom:16px;
+    background:linear-gradient(135deg,rgba(28,39,64,0.95),rgba(19,28,46,0.95));
+    border-radius:16px;
+    display:none;
+    border-right:4px solid;
+    animation:fadeUp .3s;
+    box-shadow:var(--shadow-card);
+    position:relative;
+  }
+  .symbol-detail.show{display:block;}
+  .symbol-detail h3{
+    font-size:1.08rem;font-weight:900;color:#fff;
+    margin-bottom:8px;display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;
+  }
+  .symbol-detail h3 .chip{
+    font-size:.7rem;font-weight:800;
+    padding:3px 10px;border-radius:20px;
+    background:rgba(34,211,238,0.15);
+    color:#22D3EE;
+    border:1px solid rgba(34,211,238,0.35);
+  }
+  .symbol-detail p{font-size:.93rem;color:var(--text);}
+
+  .progress-row{
+    display:flex;align-items:center;gap:12px;
+    flex-wrap:wrap;justify-content:center;
+    padding:14px 22px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:14px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    margin-bottom:16px;
+  }
+  .progress-text{
+    font-size:.86rem;color:#22D3EE;font-weight:800;
+    letter-spacing:.3px;
+  }
+  .progress-bar{
+    flex:1;max-width:400px;height:10px;border-radius:20px;
+    background:rgba(11,18,32,0.7);
+    overflow:hidden;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#22D3EE,#38BDF8,#A855F7,#F472B6);
+    width:0%;transition:width .5s ease;
+    border-radius:20px;
+    box-shadow:0 0 12px rgba(34,211,238,0.6);
+  }
+
+  /* ============ MATCH PANEL ============ */
+  .match-wrap{
+    padding:22px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:18px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+  }
+  .match-wrap > h2{
+    font-size:1.1rem;font-weight:900;color:#fff;
+    margin-bottom:6px;display:flex;align-items:center;gap:8px;
+  }
+  .match-wrap > h2 svg{color:#A855F7;filter:drop-shadow(0 0 6px rgba(168,85,247,0.6));}
+  .match-sub{
+    font-size:.88rem;color:var(--text-light);margin-bottom:16px;
+  }
+  .match-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:18px;
+  }
+  .match-col h4{
+    font-size:.85rem;font-weight:800;
+    color:#22D3EE;margin-bottom:10px;
+    text-align:center;letter-spacing:.5px;
+    text-transform:uppercase;
+  }
+  .match-item{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border:1px solid rgba(107,122,153,0.3);
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:.85rem;font-weight:700;
+    color:var(--text);
+    margin-bottom:9px;cursor:pointer;
+    transition:all .25s;
+    display:flex;align-items:center;gap:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    min-height:52px;
+  }
+  .match-item:hover{
+    border-color:rgba(34,211,238,0.6);
+    transform:translateX(-3px);
+    box-shadow:0 6px 16px rgba(34,211,238,0.2);
+  }
+  .match-item.selected{
+    border-color:#FBBF24;
+    background:linear-gradient(145deg,#2b2410,#1e1a0a);
+    box-shadow:0 0 20px rgba(251,191,36,0.4);
+  }
+  .match-item.matched{
+    border-color:#10B981;
+    background:linear-gradient(145deg,#0d2b1f,#081f16);
+    cursor:default;opacity:.85;
+  }
+  .match-item.matched::after{
+    content:'✓';margin-right:auto;
+    color:#10B981;font-weight:900;font-size:1rem;
+    filter:drop-shadow(0 0 5px rgba(16,185,129,0.8));
+  }
+  .match-item .mini-svg{
+    width:38px;height:32px;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .act-actions{
+    margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    justify-content:center;
+  }
+  .btn{
+    font-family:inherit;font-size:.88rem;font-weight:800;
+    border:none;border-radius:12px;
+    padding:11px 22px;cursor:pointer;
+    transition:all .22s;
+    display:inline-flex;align-items:center;gap:8px;
+    letter-spacing:.2px;
+  }
+  .btn svg{width:16px;height:16px;}
+  .btn-cyan{
+    background:linear-gradient(135deg,#22D3EE,#38BDF8);
+    color:#0B1220;
+    box-shadow:0 6px 20px rgba(34,211,238,0.4);
+  }
+  .btn-cyan:hover{
+    box-shadow:0 10px 26px rgba(34,211,238,0.6);
+    transform:translateY(-2px);
+  }
+  .btn-purple{
+    background:linear-gradient(135deg,#A855F7,#F472B6);
+    color:#fff;
+    box-shadow:0 6px 20px rgba(168,85,247,0.4);
+  }
+  .btn-purple:hover{
+    box-shadow:0 10px 26px rgba(168,85,247,0.6);
+    transform:translateY(-2px);
+  }
+  .btn-orange{
+    background:linear-gradient(135deg,#FBBF24,#F97316);
+    color:#0B1220;
+    box-shadow:0 6px 20px rgba(251,191,36,0.4);
+  }
+  .btn-orange:hover{
+    box-shadow:0 10px 26px rgba(251,191,36,0.6);
+    transform:translateY(-2px);
+  }
+  .btn-metal{
+    background:linear-gradient(135deg,#2a3752,#1a2235);
+    color:#E2E8F0;
+    border:1px solid rgba(199,208,224,0.3);
+  }
+  .btn-metal:hover{
+    border-color:#22D3EE;
+    box-shadow:0 0 18px rgba(34,211,238,0.3);
+  }
+
+  .act-feedback{
+    margin-top:14px;padding:14px 18px;border-radius:12px;
+    font-size:.9rem;font-weight:700;display:none;
+    border-right:5px solid #10B981;
+    background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.08));
+    color:#6EE7B7;
+    box-shadow:0 4px 14px rgba(16,185,129,0.15);
+  }
+  .act-feedback.show{display:block;animation:fadeUp .3s;}
+  .act-feedback.err{
+    border-color:#EF4444;
+    background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.08));
+    color:#FCA5A5;
+    box-shadow:0 4px 14px rgba(239,68,68,0.15);
+  }
+
+  /* ============ BUILD PANEL ============ */
+  .build-wrap{
+    display:grid;
+    grid-template-columns:1fr 220px;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  @media(max-width:900px){.build-wrap{grid-template-columns:1fr;}}
+
+  .canvas-area{
+    position:relative;
+    min-height:480px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(34,211,238,0.04) 0%, transparent 60%),
+      linear-gradient(135deg,#0d1526,#0a1120);
+    border-radius:16px;
+    border:2px solid transparent;
+    background-clip:padding-box;
+    overflow:hidden;
+    box-shadow:
+      inset 0 0 60px rgba(0,0,0,0.6),
+      var(--shadow-card);
+  }
+  .canvas-area::before{
+    content:'';
+    position:absolute;inset:-2px;
+    border-radius:18px;
+    background:var(--border-metal);
+    z-index:-1;
+    opacity:0.6;
+  }
+  .canvas-area::after{
+    content:'';
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(34,211,238,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.08) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+  }
+  .canvas-area .drop-hint{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:10px;
+    color:rgba(148,163,184,0.5);
+    font-weight:700;font-size:.92rem;
+    pointer-events:none;
+    transition:opacity .3s;
+  }
+  .canvas-area .drop-hint svg{
+    width:48px;height:48px;
+    opacity:0.4;
+  }
+  .canvas-area.has-shapes .drop-hint{opacity:0;}
+
+  .placed-shape{
+    position:absolute;
+    width:100px;height:72px;
+    cursor:move;
+    transition:filter .25s;
+    user-select:none;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+    z-index:10;
+  }
+  .placed-shape:hover{
+    filter:drop-shadow(0 8px 22px var(--shape-glow,rgba(34,211,238,0.6)));
+  }
+  .placed-shape svg{width:100%;height:100%;}
+  .placed-shape .label{
+    position:absolute;
+    bottom:-22px;right:50%;transform:translateX(50%);
+    background:rgba(11,18,32,0.9);
+    color:var(--text);
+    font-size:.68rem;font-weight:800;
+    padding:2px 8px;border-radius:8px;
+    white-space:nowrap;
+    border:1px solid rgba(107,122,153,0.4);
+  }
+  .placed-shape .del{
+    position:absolute;top:-8px;left:-8px;
+    width:20px;height:20px;border-radius:50%;
+    background:#EF4444;
+    color:#fff;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:.7rem;
+    opacity:0;transition:opacity .2s;
+    box-shadow:0 0 10px rgba(239,68,68,0.6);
+  }
+  .placed-shape:hover .del{opacity:1;}
+
+  /* shape palette */
+  .shape-palette{
+    padding:14px;
+    background:linear-gradient(135deg,var(--bg-2),var(--bg-1));
+    border-radius:16px;
+    box-shadow:var(--shadow-card);
+    border:1px solid rgba(107,122,153,0.25);
+    display:flex;flex-direction:column;gap:10px;
+    max-height:520px;overflow-y:auto;
+  }
+  .shape-palette h3{
+    font-size:.88rem;font-weight:900;color:#22D3EE;
+    margin-bottom:4px;letter-spacing:.3px;
+    text-transform:uppercase;
+    display:flex;align-items:center;gap:6px;
+  }
+  .shape-palette h3 svg{width:15px;height:15px;filter:drop-shadow(0 0 5px rgba(34,211,238,0.6));}
+  .palette-item{
+    background:linear-gradient(145deg,#1e2a44,#141c2e);
+    border:1px solid rgba(107,122,153,0.3);
+    border-radius:10px;
+    padding:8px;cursor:grab;
+    transition:all .2s;
+    display:flex;align-items:center;gap:10px;
+    user-select:none;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
+  }
+  .palette-item:hover{
+    transform:translateY(-2px) scale(1.02);
+    border-color:var(--shape-color);
+    box-shadow:0 0 18px var(--shape-color-glow);
+  }
+  .palette-item:active{cursor:grabbing;}
+  .palette-item.dragging{opacity:.4;}
+  .palette-item .mini-svg{
+    width:46px;height:36px;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    filter:drop-shadow(0 0 6px var(--shape-color-glow));
+  }
+  .palette-item .label{
+    font-size:.76rem;font-weight:800;color:#E2E8F0;
+    line-height:1.25;
+  }
+  .palette-item[data-shape="oval"]{--shape-color:#10B981;--shape-color-glow:rgba(16,185,129,0.6);}
+  .palette-item[data-shape="rect"]{--shape-color:#38BDF8;--shape-color-glow:rgba(56,189,248,0.6);}
+  .palette-item[data-shape="diamond"]{--shape-color:#FBBF24;--shape-color-glow:rgba(251,191,36,0.6);}
+  .palette-item[data-shape="doc"]{--shape-color:#F97316;--shape-color-glow:rgba(249,115,22,0.6);}
+  .palette-item[data-shape="parallelogram"]{--shape-color:#A855F7;--shape-color-glow:rgba(168,85,247,0.6);}
+  .palette-item[data-shape="arrow"]{--shape-color:#F472B6;--shape-color-glow:rgba(244,114,182,0.6);}
+
+  .placed-shape[data-shape="oval"]{--shape-glow:rgba(16,185,129,0.8);}
+  .placed-shape[data-shape="rect"]{--shape-glow:rgba(56,189,248,0.8);}
+  .placed-shape[data-shape="diamond"]{--shape-glow:rgba(251,191,36,0.8);}
+  .placed-shape[data-shape="doc"]{--shape-glow:rgba(249,115,22,0.8);}
+  .placed-shape[data-shape="parallelogram"]{--shape-glow:rgba(168,85,247,0.8);}
+  .placed-shape[data-shape="arrow"]{--shape-glow:rgba(244,114,182,0.8);}
+
+  .mission-box{
+    padding:14px 18px;margin-bottom:14px;
+    background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(249,115,22,0.08));
+    border-right:4px solid #FBBF24;
+    border-radius:12px;
+    font-size:.9rem;color:var(--text);
+    box-shadow:0 4px 14px rgba(251,191,36,0.15);
+  }
+  .mission-box strong{color:#FBBF24;}
+  .mission-box ul{
+    list-style:none;padding:0;margin-top:8px;
+    display:flex;flex-wrap:wrap;gap:6px;
+  }
+  .mission-box li{
+    background:rgba(11,18,32,0.6);
+    padding:4px 12px;border-radius:20px;
+    font-size:.78rem;font-weight:800;
+    color:#FBBF24;
+    border:1px solid rgba(251,191,36,0.35);
+  }
+
+  /* ============ FOOTER ============ */
+  .footer{
+    text-align:center;font-size:.85rem;
+    color:var(--text-dim);
+    padding:26px 20px 30px;margin-top:10px;
+  }
+  .footer span{
+    color:#22D3EE;font-weight:800;
+    text-shadow:0 0 8px rgba(34,211,238,0.5);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:760px){
+    .lesson-head h1{font-size:1.15rem;}
+    .tab-btn{min-width:auto;font-size:.76rem;padding:9px 8px;}
+    .tab-btn svg{width:14px;height:14px;}
+    .symbol-card{padding:12px 8px;}
+    .symbol-card .symbol-svg{width:64px;height:48px;}
+    .match-grid{grid-template-columns:1fr;}
+    .match-item{font-size:.8rem;padding:10px 12px;}
+    .canvas-area{min-height:380px;}
+    .placed-shape{width:80px;height:58px;}
+    .palette-item{padding:6px;}
+    .palette-item .mini-svg{width:38px;height:30px;}
+    .palette-item .label{font-size:.72rem;}
+    .btn{padding:9px 16px;font-size:.82rem;}
+  }
+
+  /* SVG symbol theme */
+  .sym-oval{fill:rgba(16,185,129,0.2);stroke:#10B981;stroke-width:2;}
+  .sym-rect{fill:rgba(56,189,248,0.2);stroke:#38BDF8;stroke-width:2;}
+  .sym-diamond{fill:rgba(251,191,36,0.2);stroke:#FBBF24;stroke-width:2;}
+  .sym-doc{fill:rgba(249,115,22,0.2);stroke:#F97316;stroke-width:2;}
+  .sym-parallelogram{fill:rgba(168,85,247,0.2);stroke:#A855F7;stroke-width:2;}
+  .sym-arrow{fill:none;stroke:#F472B6;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">
+      <span class="icon-badge"><i data-lucide="shapes"></i></span>
+      <span>الأشكال الأساسية لمخطط سير العمل</span>
+      <span class="chip">المحطة 3</span>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="nav-btn"><i data-lucide="home"></i> الرئيسية</a>
+      <a href="02.html" class="nav-btn"><i data-lucide="arrow-right"></i> السابق</a>
+      <a href="05.html" class="nav-btn"><i data-lucide="arrow-left"></i> التالي</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="lesson-head metal-card">
+    <h1><i data-lucide="shapes"></i> الأشكال الأساسية لمخطط سير العمل <span class="badge">ورشة التصميم</span></h1>
+    <p>توجد العديد من الرموز التي يمكنك استخدامها لتمثيل جميع عناصر مُخَطَّط سير العمل. فعلى سبيل المثال، يتم تمثيل العملية في مُخَطَّط على شكل مستطيل، بينما يتم استخدام شكل المعين لتمثيل اتخاذ القرار. استكشف الأشكال الستة، وطابقها، ثم ابنِ مخططك.</p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-panel="symbols" role="tab"><i data-lucide="shapes"></i> الرموز</button>
+    <button class="tab-btn" data-panel="match" role="tab"><i data-lucide="link-2"></i> صِل</button>
+    <button class="tab-btn" data-panel="build" role="tab"><i data-lucide="hammer"></i> ابنِ</button>
+  </div>
+
+  <!-- ============ SYMBOLS PANEL ============ -->
+  <section class="panel active" id="panel-symbols">
+    <div class="symbol-grid" id="symbolGrid"></div>
+
+    <div class="symbol-detail" id="symbolDetail">
+      <h3 id="sdTitle">— <span class="chip" id="sdEn">—</span></h3>
+      <p id="sdDesc">—</p>
+    </div>
+
+    <div class="progress-row">
+      <span class="progress-text" id="symbolProgress">استكشاف 0 من 6</span>
+      <div class="progress-bar"><div class="progress-fill" id="symbolProgressFill"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ MATCH PANEL ============ -->
+  <section class="panel" id="panel-match">
+    <div class="match-wrap">
+      <h2><i data-lucide="link-2"></i> لعبة المطابقة: صِل الشكل بوصفه</h2>
+      <p class="match-sub">اختر شكلًا من العمود الأيمن، ثم اختر الوصف المناسب له من العمود الأيسر.</p>
+
+      <div class="match-grid">
+        <div class="match-col">
+          <h4>الأوصاف</h4>
+          <div id="matchDescs"></div>
+        </div>
+        <div class="match-col">
+          <h4>الأشكال</h4>
+          <div id="matchShapes"></div>
+        </div>
+      </div>
+
+      <div class="act-actions">
+        <button class="btn btn-metal" id="resetMatchBtn"><i data-lucide="rotate-ccw"></i> إعادة</button>
+      </div>
+      <div class="act-feedback" id="matchFb"></div>
+    </div>
+  </section>
+
+  <!-- ============ BUILD PANEL ============ -->
+  <section class="panel" id="panel-build">
+    <div class="mission-box">
+      <strong>🎯 مهمتك:</strong> ابنِ مخطط سير عمل بسيط لـ <strong>«التحقق من كلمة المرور»</strong> باستخدام الأشكال الصحيحة.
+      <ul>
+        <li>ابدأ بالبيضاوي (البداية)</li>
+        <li>استخدم المستند للإدخال</li>
+        <li>استخدم المعين للقرار</li>
+        <li>انتهِ بالبيضاوي (النهاية)</li>
+      </ul>
+    </div>
+
+    <div class="build-wrap">
+      <div class="canvas-area" id="canvasArea">
+        <div class="drop-hint">
+          <i data-lucide="mouse-pointer-2"></i>
+          <span>اسحب الأشكال من اللوحة اليمنى إلى هنا</span>
+        </div>
+      </div>
+
+      <aside class="shape-palette" id="shapePalette">
+        <h3><i data-lucide="box"></i> الأشكال</h3>
+      </aside>
+    </div>
+
+    <div class="act-actions">
+      <button class="btn btn-orange" id="checkBuildBtn"><i data-lucide="check-circle"></i> تحقق من المخطط</button>
+      <button class="btn btn-metal" id="clearBuildBtn"><i data-lucide="trash-2"></i> مسح الكل</button>
+    </div>
+    <div class="act-feedback" id="buildFb"></div>
+  </section>
+
+</main>
+
+<footer class="footer">فكرة وتصميم <span>محمد مجممي</span></footer>
+
+<script>
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    if(window.lucide) lucide.createIcons();
+  });
+});
+
+/* ============ DATA ============ */
+const shapes = [
+  {
+    id:'oval', name:'البداية أو نهاية', en:'Oval', color:'#10B981',
+    desc:'يمثل نقطة بداية أو نهاية سير العمل. يظهر في أول المخطط وآخره.',
+    svg:`<svg viewBox="0 0 100 60"><ellipse cx="50" cy="30" rx="42" ry="22" class="sym-oval"/></svg>`
+  },
+  {
+    id:'rect', name:'العملية', en:'Rectangle', color:'#38BDF8',
+    desc:'يمثل عملية أو وظيفة. هو الشكل الأكثر استخدامًا في مخطط سير العمل.',
+    svg:`<svg viewBox="0 0 100 60"><rect x="8" y="12" width="84" height="36" rx="4" class="sym-rect"/></svg>`
+  },
+  {
+    id:'diamond', name:'القرار', en:'Diamond', color:'#FBBF24',
+    desc:'يمثل قرارًا يلزم اتخاذه ويؤدي إلى عملية أو قرار آخر. عادةً يكون له مسارَان: نعم / لا.',
+    svg:`<svg viewBox="0 0 100 60"><polygon points="50,6 94,30 50,54 6,30" class="sym-diamond"/></svg>`
+  },
+  {
+    id:'doc', name:'المستند', en:'Document', color:'#F97316',
+    desc:'يمثل مستندًا ناتجًا عن عملية أو وظيفة، مثل تقارير الخطأ وغيرها.',
+    svg:`<svg viewBox="0 0 100 60"><path d="M10,10 L90,10 L90,42 Q75,52 60,42 Q45,32 30,42 Q20,48 10,42 Z" class="sym-doc"/></svg>`
+  },
+  {
+    id:'parallelogram', name:'الإدخال أو الإخراج', en:'Input/Output', color:'#A855F7',
+    desc:'يمثل عملية إدخال أو عملية إخراج. يُستخدم عند استقبال بيانات من المستخدم أو إظهار نتائج.',
+    svg:`<svg viewBox="0 0 100 60"><polygon points="20,12 100,12 80,48 0,48" class="sym-parallelogram"/></svg>`
+  },
+  {
+    id:'arrow', name:'اتجاه التدفق', en:'Arrow', color:'#F472B6',
+    desc:'يوضح العلاقة بين العمليات واتجاه تدفقها. يربط بين الأشكال في المخطط.',
+    svg:`<svg viewBox="0 0 100 60"><path d="M15,30 L75,30 M60,15 L75,30 L60,45" class="sym-arrow" fill="none"/></svg>`
+  }
+];
+
+/* ============ SYMBOLS PANEL ============ */
+const symbolGrid = document.getElementById('symbolGrid');
+const symbolDetail = document.getElementById('symbolDetail');
+const sdTitle = document.getElementById('sdTitle');
+const sdEn = document.getElementById('sdEn');
+const sdDesc = document.getElementById('sdDesc');
+const visitedShapes = new Set();
+
+function buildSymbols(){
+  symbolGrid.innerHTML = '';
+  shapes.forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'symbol-card';
+    card.dataset.shape = s.id;
+    card.style.setProperty('--shape-color', s.color);
+    card.innerHTML = `
+      <div class="symbol-svg">${s.svg}</div>
+      <h4>${s.name}</h4>
+      <p>${s.en}</p>
+    `;
+    card.addEventListener('click',()=>selectShape(s));
+    symbolGrid.appendChild(card);
+  });
+  updateSymbolProgress();
+}
+
+function selectShape(s){
+  visitedShapes.add(s.id);
+  document.querySelectorAll('.symbol-card').forEach(c=>{
+    if(c.dataset.shape === s.id) c.classList.add('visited');
+  });
+  sdTitle.childNodes[0].textContent = s.name + ' ';
+  sdEn.textContent = s.en;
+  sdDesc.textContent = s.desc;
+  symbolDetail.style.borderRightColor = s.color;
+  symbolDetail.classList.add('show');
+  updateSymbolProgress();
+}
+
+function updateSymbolProgress(){
+  const n = visitedShapes.size;
+  document.getElementById('symbolProgress').textContent = `استكشاف ${n} من 6`;
+  document.getElementById('symbolProgressFill').style.width = (n/6*100) + '%';
+}
+
+/* ============ MATCH PANEL ============ */
+const matchDescs = document.getElementById('matchDescs');
+const matchShapesBox = document.getElementById('matchShapes');
+let selectedShapeId = null;
+let matchedPairs = 0;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildMatch(){
+  matchDescs.innerHTML = '';
+  matchShapesBox.innerHTML = '';
+  selectedShapeId = null;
+  matchedPairs = 0;
+
+  // Shape cards (right side)
+  shuffle(shapes).forEach(s=>{
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.dataset.shape = s.id;
+    item.innerHTML = `
+      <span class="mini-svg">${s.svg}</span>
+      <span>${s.name}</span>
+    `;
+    item.addEventListener('click',()=>{
+      if(item.classList.contains('matched')) return;
+      document.querySelectorAll('#matchShapes .match-item').forEach(x=>x.classList.remove('selected'));
+      item.classList.add('selected');
+      selectedShapeId = s.id;
+    });
+    matchShapesBox.appendChild(item);
+  });
+
+  // Desc cards (left side)
+  shuffle(shapes).forEach(s=>{
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.dataset.shape = s.id;
+    item.innerHTML = `<span>${s.desc}</span>`;
+    item.addEventListener('click',()=>{
+      if(item.classList.contains('matched')) return;
+      if(!selectedShapeId){
+        flashMatchFb('اختر شكلًا أولًا من العمود الأيمن.', 'err');
+        return;
+      }
+      if(item.dataset.shape === selectedShapeId){
+        item.classList.add('matched');
+        const shapeEl = document.querySelector(`#matchShapes .match-item[data-shape="${selectedShapeId}"]`);
+        if(shapeEl) shapeEl.classList.add('matched');
+        matchedPairs++;
+        flashMatchFb('✓ أحسنت! هذه المطابقة صحيحة.', 'ok');
+        selectedShapeId = null;
+        document.querySelectorAll('#matchShapes .match-item').forEach(x=>x.classList.remove('selected'));
+        if(matchedPairs === shapes.length){
+          flashMatchFb('🎉 رائع! أتممت جميع المطابقات الستة بنجاح.', 'ok');
+        }
+      } else {
+        flashMatchFb('✗ هذا الوصف لا ينتمي للشكل المختار. حاول مرة أخرى.', 'err');
+      }
+    });
+    matchDescs.appendChild(item);
+  });
+}
+
+function flashMatchFb(msg, type){
+  const fb = document.getElementById('matchFb');
+  fb.className = 'act-feedback show ' + (type === 'err' ? 'err' : '');
+  fb.textContent = msg;
+}
+
+document.getElementById('resetMatchBtn').addEventListener('click',()=>{
+  buildMatch();
+  document.getElementById('matchFb').className = 'act-feedback';
+});
+
+/* ============ BUILD PANEL ============ */
+const canvasArea = document.getElementById('canvasArea');
+const shapePalette = document.getElementById('shapePalette');
+
+function buildPalette(){
+  // clear all but heading
+  shapePalette.querySelectorAll('.palette-item').forEach(el=>el.remove());
+  shapes.forEach(s=>{
+    const item = document.createElement('div');
+    item.className = 'palette-item';
+    item.dataset.shape = s.id;
+    item.draggable = true;
+    item.innerHTML = `
+      <span class="mini-svg">${s.svg}</span>
+      <span class="label">${s.name}</span>
+    `;
+    item.addEventListener('dragstart',(e)=>{
+      e.dataTransfer.setData('text/plain', 'shape:' + s.id);
+      item.classList.add('dragging');
+    });
+    item.addEventListener('dragend',()=>item.classList.remove('dragging'));
+    shapePalette.appendChild(item);
+  });
+}
+
+let shapeCounter = 0;
+
+canvasArea.addEventListener('dragover',(e)=>{
+  e.preventDefault();
+  canvasArea.style.borderColor = '#22D3EE';
+});
+canvasArea.addEventListener('dragleave',()=>{
+  canvasArea.style.borderColor = 'transparent';
+});
+canvasArea.addEventListener('drop',(e)=>{
+  e.preventDefault();
+  canvasArea.style.borderColor = 'transparent';
+  const data = e.dataTransfer.getData('text/plain');
+  if(!data.startsWith('shape:')) return;
+  const shapeId = data.substring(6);
+  const s = shapes.find(x=>x.id === shapeId);
+  if(!s) return;
+
+  const rect = canvasArea.getBoundingClientRect();
+  const x = e.clientX - rect.left - 50;
+  const y = e.clientY - rect.top - 36;
+
+  placeShape(s, Math.max(6, x), Math.max(6, y));
+  canvasArea.classList.add('has-shapes');
+});
+
+function placeShape(s, x, y){
+  const id = 'placed-' + (++shapeCounter);
+  const el = document.createElement('div');
+  el.className = 'placed-shape';
+  el.id = id;
+  el.dataset.shape = s.id;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.innerHTML = `
+    ${s.svg}
+    <span class="label">${s.name}</span>
+    <button class="del" title="حذف">×</button>
+  `;
+
+  // drag within canvas
+  let dragging = false, offX = 0, offY = 0;
+  el.addEventListener('pointerdown',(e)=>{
+    if(e.target.classList.contains('del')) return;
+    dragging = true;
+    const r = el.getBoundingClientRect();
+    offX = e.clientX - r.left;
+    offY = e.clientY - r.top;
+    el.setPointerCapture(e.pointerId);
+    el.style.zIndex = 20;
+  });
+  el.addEventListener('pointermove',(e)=>{
+    if(!dragging) return;
+    const rect = canvasArea.getBoundingClientRect();
+    let nx = e.clientX - rect.left - offX;
+    let ny = e.clientY - rect.top - offY;
+    nx = Math.max(0, Math.min(rect.width - 100, nx));
+    ny = Math.max(0, Math.min(rect.height - 72, ny));
+    el.style.left = nx + 'px';
+    el.style.top = ny + 'px';
+  });
+  el.addEventListener('pointerup',()=>{
+    dragging = false;
+    el.style.zIndex = 10;
+  });
+
+  el.querySelector('.del').addEventListener('click',()=>{
+    el.remove();
+    if(!canvasArea.querySelector('.placed-shape')){
+      canvasArea.classList.remove('has-shapes');
+    }
+  });
+
+  canvasArea.appendChild(el);
+}
+
+document.getElementById('clearBuildBtn').addEventListener('click',()=>{
+  canvasArea.querySelectorAll('.placed-shape').forEach(el=>el.remove());
+  canvasArea.classList.remove('has-shapes');
+  document.getElementById('buildFb').className = 'act-feedback';
+});
+
+document.getElementById('checkBuildBtn').addEventListener('click',()=>{
+  const placed = Array.from(canvasArea.querySelectorAll('.placed-shape'));
+  const fb = document.getElementById('buildFb');
+
+  if(placed.length < 4){
+    fb.className = 'act-feedback err show';
+    fb.textContent = '⚠ المخطط غير مكتمل. أضف 4 أشكال على الأقل (بداية، إدخال، قرار، نهاية).';
+    return;
+  }
+
+  const ids = placed.map(el=>el.dataset.shape);
+  const hasOval = ids.filter(x=>x==='oval').length;
+  const hasDoc = ids.includes('doc');
+  const hasPar = ids.includes('parallelogram');
+  const hasDiamond = ids.includes('diamond');
+
+  if(hasOval >= 2 && (hasDoc || hasPar) && hasDiamond){
+    fb.className = 'act-feedback show';
+    fb.innerHTML = '🎉 <strong>ممتاز!</strong> مخططك صحيح: يبدأ بالبيضاوي (البداية)، يستقبل الإدخال، يتخذ قرارًا بالمعين، وينتهي بالبيضاوي (النهاية). أحسنت!';
+  } else {
+    let hints = [];
+    if(hasOval < 2) hints.push('أضف بيضاويين (بداية ونهاية)');
+    if(!hasDoc && !hasPar) hints.push('أضف شكل إدخال (متوازي أو مستند)');
+    if(!hasDiamond) hints.push('أضف معينًا للقرار');
+    fb.className = 'act-feedback err show';
+    fb.innerHTML = '⚠ <strong>المخطط غير مكتمل:</strong> ' + hints.join(' • ');
+  }
+});
+
+/* ============ INIT ============ */
+buildSymbols();
+buildMatch();
+buildPalette();
+if(window.lucide) lucide.createIcons();
+setTimeout(()=>{ if(window.lucide) lucide.createIcons(); }, 200);
+</script>
+</body>
+</html>
